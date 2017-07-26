@@ -13,6 +13,11 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
       Resource: "arn:aws:dynamodb:us-east-1:*:*"
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+      Resource: "*"
 
 resources:
   Resources:
@@ -29,6 +34,10 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    currencyStorage:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: currencybucket
 
 functions:
   LineBot:

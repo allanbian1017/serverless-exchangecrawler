@@ -1,8 +1,10 @@
 'use strict';
 
+const AWS = require('aws-sdk');
 const HttpClient = require('../lib/httpclient');
 const Currency = require('../lib/currency');
 const CurrencyBot = require('../lib/currencybot');
+const BotUser = require('../lib/botuser');
 const Config = require('../lib/config');
 const line = require('@line/bot-sdk');
 const moment = require('moment');
@@ -10,11 +12,13 @@ const moment = require('moment');
 exports.main = (event, context, cb) => {
   console.log(event);
 
+  const s3 = new AWS.S3();
   const httpclient = new HttpClient();
   const currency = new Currency({ client: httpclient });
   const config = Config.get(process.env.AWS_REGION);
   const client = new line.Client(config.line_config);
-  const bot = new CurrencyBot({ lineclient: client });
+  const botuser = new BotUser({ storage: s3 });
+  const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
   const body = JSON.parse(event.body);
   let response = {};
 
@@ -36,6 +40,8 @@ exports.main = (event, context, cb) => {
       cb(null, response);
     })
     .catch(function(err) {
+      console.log(err);
+
       cb(err);
     });
 };

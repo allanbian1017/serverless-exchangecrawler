@@ -1,4 +1,5 @@
 const CurrencyBot = require('../lib/currencybot');
+const BotUser = require('../lib/botuser');
 const should = require('should');
 const sinon = require('sinon');
 const line = require('@line/bot-sdk');
@@ -33,7 +34,7 @@ describe('CurrencyBot', function() {
 
   before(function() {
     lineclient = new line.Client({ channelAccessToken: 'xxx', channelSecret: 'xxx'});
-    bot = new CurrencyBot({ lineclient: lineclient, linesecret: 'xxx' });
+    bot = new CurrencyBot({ lineclient: lineclient });
   });
 
   describe('#lineBotHandler()', function() {
