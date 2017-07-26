@@ -1,0 +1,44 @@
+service: ExchangeCrawler
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  stage: dev
+  region: us-east-1
+  memorySize: 256
+  versionFunctions: false
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+
+resources:
+  Resources:
+    currencyTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: currency
+        AttributeDefinitions:
+          - AttributeName: bank
+            AttributeType: S
+        KeySchema:
+          - AttributeName: bank
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  LineBot:
+    handler: src/linebot.main
+    events:
+      - http:
+          path: bot/line
+          method: post
+  Crawler:
+    handler: src/crawler.main
+    events:
+      - schedule:
+          rate: rate(1 hour)

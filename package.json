@@ -1,0 +1,21 @@
+{
+  "name": "exchange-crawler",
+  "version": "1.0.0",
+  "description": "exchange rate crawler",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha"
+  },
+  "author": "allanbian",
+  "dependencies": {
+    "@line/bot-sdk": "^1.0.0",
+    "moment": "^2.18.1",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.4",
+    "mocha": "^3.4.1",
+    "should": "^11.2.1",
+    "sinon": "^2.2.0"
+  }
+}
