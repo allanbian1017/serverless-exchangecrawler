@@ -48,16 +48,6 @@ exports.main = (event, context, cb) => {
 };
 
 function updateCurrency(history, bot, data) {
-  const ids = [
-    'Uc5eb6efd53fe44b958128cf98b873fe9', 
-    'U765f72b839c13144dd8e6ace73433e28', 
-    'Ua0293a371781d17ced98ec2978dd25a3', 
-    'U7f5e10551c63fe184d4f19a92f7a8141', 
-    'U7dcd7cf0061f4d1807bdfefb43c99446',
-    'Uf36890f48d1fbd41e69e2688e5b24e32',
-    'U4799b2bfc72d72411520a17b376b949f'
-  ];
-
   return history.put('BOT', data)
     .then(function() {
       return bot.lineBotPublish(getCurrencyMsg(data));
