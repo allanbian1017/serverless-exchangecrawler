@@ -24,7 +24,10 @@ exports.main = (event, context, cb) => {
   const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
   let cur = {};
 
-  currency.query({ types: ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'] })
+  Promise.resolve()
+    .then(function() {
+      return currency.query({ types: ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'] });
+    })
     .then(function(data) {
       cur = data;
 
@@ -48,7 +51,10 @@ exports.main = (event, context, cb) => {
 };
 
 function updateCurrency(history, bot, data) {
-  return history.put('BOT', data)
+  return Promise.resolve()
+    .then(function() {
+      return history.put('BOT', data);
+    })
     .then(function() {
       return bot.lineBotPublish(getCurrencyMsg(data));
     });

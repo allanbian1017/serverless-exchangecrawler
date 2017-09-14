@@ -31,7 +31,10 @@ exports.main = (event, context, cb) => {
     return cb(null, response);
   }
 
-  currency.query({ types: ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'] })
+  Promise.resolve()
+    .then(function() {
+      return currency.query({ types: ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'] });
+    })
     .then(function(data) {
       return bot.lineBotHandler(event.headers, body, { default: getCurrencyMsg(data) });
     })
