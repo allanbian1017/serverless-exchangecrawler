@@ -33,7 +33,7 @@ describe('Currency', function() {
       let fixedObj = { body: fixedBody, headers: {} };
       fixedObj.headers['content-disposition'] = fixedContentHeaders;
       
-      sandbox.stub(client, 'get').withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day').yields(null, fixedObj);
+      sandbox.stub(client, 'get').withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day').resolves(fixedObj);
 
       return currency.query({ types: ['USD'] })
         .then(function(data) {
