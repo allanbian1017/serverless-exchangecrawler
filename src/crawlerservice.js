@@ -6,13 +6,13 @@ const moment = require('moment');
  * Constructor for CrawlerService object.
  *
  * @param {Object} options JSON configuration.
- * @param {Object} options.currency Currency object.
+ * @param {Object} options.src CurrencySource object.
  * @param {Object} options.bot CurrencyBot object.
  * @param {Object} options.history CurrencyHist object.
  */
 const CrawlerService = class {
   constructor(options) {
-    this.currency = options.currency;
+    this.src = options.src;
     this.bot = options.bot;
     this.history = options.history;
   }
@@ -66,7 +66,7 @@ const CrawlerService = class {
 
     return Promise.resolve()
       .then(function() {
-        return self.currency.query({ types: types });
+        return self.src.query({ types: types });
       })
       .then(function(data) {
         let p = [];

@@ -1,4 +1,4 @@
-const Currency = require('../lib/currency');
+const CurrencySource = require('../lib/currencysource');
 const HttpClient = require('../lib/httpclient');
 const should = require('should');
 const sinon = require('sinon');
@@ -10,11 +10,11 @@ describe('Currency', function() {
 'CNY         本行買入      4.28200     4.35400         4.34810         4.33640         4.32010         4.30290         4.28440         4.26590         4.24750 本行賣出      4.44400     4.40400         4.40050         4.39340         4.38100         4.36760         4.35400         4.34050         4.32710\n';
   const fixedContentHeaders = 'attachment; filename="ExchangeRate@201705171607.txt"';
   let client;
-  let currency;
+  let src;
 
   before(function() {
     client = new HttpClient();
-    currency = new Currency({ client: client });
+    src = new CurrencySource({ client: client });
   });
 
   describe('#query()', function() {
@@ -37,7 +37,7 @@ describe('Currency', function() {
         .withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day').resolves(fixedObj)
         .withArgs().resolves();
 
-      return currency.query({ types: ['USD'] })
+      return src.query({ types: ['USD'] })
         .then(function(data) {
           data.should.have.property('USD', expectUSD);
           return Promise.resolve();

@@ -1,4 +1,4 @@
-const Currency = require('../lib/currency');
+const CurrencySource = require('../lib/currencysource');
 const CurrencyHist = require('../lib/currencyhistory');
 const CurrencyBot = require('../lib/currencybot');
 const CrawlerService = require('../src/crawlerservice');
@@ -6,16 +6,16 @@ const should = require('should');
 const sinon = require('sinon');
 
 describe('CrawlerService', function() {
-  let currency;
+  let src;
   let history;
   let bot;
   let service;
 
   before(function() {
-    currency = new Currency({ client: '' });
+    src = new CurrencySource({ client: '' });
     history = new CurrencyHist({ db: '' });
     bot = new CurrencyBot({ lineclient: '', botuser: '' });
-    service = new CrawlerService({ bot: bot, history: history, currency: currency });
+    service = new CrawlerService({ bot: bot, history: history, src: src });
   });
 
   describe('#processLineEvents()', function() {
@@ -119,7 +119,7 @@ describe('CrawlerService', function() {
         CNY: 4.5
       };
 
-      sandbox.stub(currency, 'query')
+      sandbox.stub(src, 'query')
         .withArgs({ types: testTypes }).resolves(testCur)
         .withArgs().rejects();
       sandbox.stub(history, 'get')
