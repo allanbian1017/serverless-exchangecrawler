@@ -22,7 +22,7 @@ exports.main = (event, context, cb) => {
   const client = new line.Client(config.line_config);
   const botuser = new BotUser({ storage: s3 });
   const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
-  const service = new CrawlerService({ bot: bot, botuser: botuser, history: history, currency: currency });
+  const service = new CrawlerService({ bot: bot, history: history, currency: currency });
   let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
 
   Promise.resolve()

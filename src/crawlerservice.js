@@ -7,14 +7,12 @@ const moment = require('moment');
  *
  * @param {Object} options JSON configuration.
  * @param {Object} options.currency Currency object.
- * @param {Object} options.botuser BotUser object.
  * @param {Object} options.bot CurrencyBot object.
  * @param {Object} options.history CurrencyHist object.
  */
 const CrawlerService = class {
   constructor(options) {
     this.currency = options.currency;
-    this.botuser = options.botuser;
     this.bot = options.bot;
     this.history = options.history;
   }
