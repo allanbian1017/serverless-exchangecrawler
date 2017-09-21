@@ -5,6 +5,7 @@ const HttpClient = require('../lib/httpclient');
 const CurrencySource = require('../lib/currencysource');
 const CurrencyInfo = require('../lib/currencyinfo');
 const CurrencyBot = require('../lib/currencybot');
+const CurrencyHistory = require('../lib/currencyhistory');
 const BotUser = require('../lib/botuser');
 const Config = require('../lib/config');
 const CrawlerService = require('./crawlerservice');
@@ -18,11 +19,12 @@ exports.main = (event, context, cb) => {
   const httpclient = new HttpClient();
   const src = new CurrencySource({ client: httpclient });
   const info = new CurrencyInfo({ db: dynamodb });
+  const history = new CurrencyHistory({ storage: s3 });
   const config = Config.get(process.env.AWS_REGION);
   const client = new line.Client(config.line_config);
   const botuser = new BotUser({ storage: s3 });
   const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
-  const service = new CrawlerService({ bot: bot, info: info, src: src });
+  const service = new CrawlerService({ bot: bot, info: info, src: src, history: history });
   let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
 
   Promise.resolve()

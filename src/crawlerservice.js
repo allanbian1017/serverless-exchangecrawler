@@ -9,12 +9,14 @@ const moment = require('moment');
  * @param {Object} options.src CurrencySource object.
  * @param {Object} options.bot CurrencyBot object.
  * @param {Object} options.info CurrencyInfo object.
+ * @param {Object} options.history CurrencyHistory object.
  */
 const CrawlerService = class {
   constructor(options) {
     this.src = options.src;
     this.bot = options.bot;
     this.info = options.info;
+    this.history = options.history;
   }
 
   /**
@@ -81,6 +83,7 @@ const CrawlerService = class {
 
         if (new Date(cur.date) > new Date(last.date)) {
           let p = [];
+          p.push(self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur));
           p.push(self.info.put('BOT', cur));
           p.push(self.bot.lineBotPublish(self.getCurrencyMsg(cur)));
 
