@@ -1,5 +1,5 @@
 const CurrencySource = require('../lib/currencysource');
-const CurrencyInfo = require('../lib/currencyinfo');
+const CurrencyCache = require('../lib/currencycache');
 const CurrencyBot = require('../lib/currencybot');
 const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('../src/crawlerservice');
@@ -8,17 +8,17 @@ const sinon = require('sinon');
 
 describe('CrawlerService', function() {
   let src;
-  let info;
+  let cache;
   let bot;
   let history;
   let service;
 
   before(function() {
     src = new CurrencySource({ client: '' });
-    info = new CurrencyInfo({ db: '' });
+    cache = new CurrencyCache({ db: '' });
     bot = new CurrencyBot({ lineclient: '', botuser: '' });
     history = new CurrencyHistory({ storage: '' });
-    service = new CrawlerService({ bot: bot, info: info, src: src, history: history });
+    service = new CrawlerService({ bot: bot, cache: cache, src: src, history: history });
   });
 
   describe('#processLineEvents()', function() {
@@ -68,7 +68,7 @@ describe('CrawlerService', function() {
           }
         ]
       };
-      sandbox.stub(info, 'get')
+      sandbox.stub(cache, 'get')
         .withArgs('BOT').resolves(testHist)
         .withArgs().rejects();
       sandbox.mock(bot)
@@ -126,13 +126,13 @@ describe('CrawlerService', function() {
       sandbox.stub(src, 'query')
         .withArgs({ types: testTypes }).resolves(testCur)
         .withArgs().rejects();
-      sandbox.stub(info, 'get')
+      sandbox.stub(cache, 'get')
         .withArgs('BOT').resolves(testHist)
         .withArgs().rejects();
       sandbox.mock(history)
         .expects('add').once()
         .withArgs('BOT', expectDate, testCur);
-      sandbox.mock(info)
+      sandbox.mock(cache)
         .expects('put').once()
         .withArgs('BOT', testCur);
       sandbox.mock(bot)
