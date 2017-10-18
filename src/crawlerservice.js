@@ -93,6 +93,21 @@ const CrawlerService = class {
         return Promise.resolve();
       });
   }
+
+  /**
+   * Fetch Currency History.
+   *
+   * @param {Object} date History date.
+   * @return {Promise}
+   */
+  fetchHistory(date) {
+    let self = this;
+
+    return Promise.resolve()
+      .then(function() {
+        return self.history.get('BOT', date);
+      });
+  }
 };
 
 module.exports = CrawlerService;
