@@ -2,6 +2,7 @@ const CurrencySource = require('../lib/currencysource');
 const CurrencyCache = require('../lib/currencycache');
 const CurrencyBot = require('../lib/currencybot');
 const CurrencyHistory = require('../lib/currencyhistory');
+const EventDispatcher = require('../lib/eventdispatcher');
 const CrawlerService = require('../src/crawlerservice');
 const should = require('should');
 const sinon = require('sinon');
@@ -11,6 +12,7 @@ describe('CrawlerService', function() {
   let cache;
   let bot;
   let history;
+  let eventdispatcher;
   let service;
 
   before(function() {
@@ -18,7 +20,8 @@ describe('CrawlerService', function() {
     cache = new CurrencyCache({ db: '' });
     bot = new CurrencyBot({ lineclient: '', botuser: '' });
     history = new CurrencyHistory({ storage: '' });
-    service = new CrawlerService({ bot: bot, cache: cache, src: src, history: history });
+    eventdispatcher = new EventDispatcher({ sns: '', arns: '' });
+    service = new CrawlerService({ bot: bot, cache: cache, src: src, history: history, eventdispatcher: eventdispatcher });
   });
 
   describe('#processLineEvents()', function() {
@@ -95,13 +98,6 @@ describe('CrawlerService', function() {
     });
 
     it('should execute success without error', function() {
-      const expectMsg = '您好\n' +
-                '美金匯率30\n' +
-                '日元匯率0.27\n' +
-                '澳幣匯率22\n' +
-                '人民幣匯率4.5\n' +
-                '更新時間:2017-09-20 10:04\n' +
-                '供您参考';
       const expectDate = '20170920';
       const testTypes = ['USD', 'JPY'];
       const testHist = {
@@ -135,11 +131,54 @@ describe('CrawlerService', function() {
       sandbox.mock(cache)
         .expects('put').once()
         .withArgs('BOT', testCur);
+      sandbox.mock(eventdispatcher)
+        .expects('dispatchCurrencyChangedEvent').once()
+        .withArgs(testCur);
+
+      return service.crawlingCurrency(testTypes)
+        .then(function(data) {
+          sandbox.verify();
+          return Promise.resolve();
+        });
+    });
+  });
+
+  describe('#processLinePublishEvents()', function() {
+    let sandbox;
+
+    beforeEach(function() {
+      sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
+    });
+
+    it('should execute success without error', function() {
+      const expectMsg = '您好\n' +
+                '美金匯率30\n' +
+                '日元匯率0.27\n' +
+                '澳幣匯率22\n' +
+                '人民幣匯率4.5\n' +
+                '更新時間:2017-09-20 10:04\n' +
+                '供您参考';
+      const testEvents = [
+        {
+          Message: JSON.stringify({
+            date: '2017-09-20T14:04:00+00:00',
+            USD: 30,
+            JPY: 0.27,
+            AUD: 22,
+            CNY: 4.5
+          })
+        }
+      ];
+
       sandbox.mock(bot)
         .expects('lineBotPublish').once()
         .withArgs(expectMsg);
 
-      return service.crawlingCurrency(testTypes)
+      return service.processLinePublishEvents(testEvents)
         .then(function(data) {
           sandbox.verify();
           return Promise.resolve();

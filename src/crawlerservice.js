@@ -10,6 +10,7 @@ const moment = require('moment');
  * @param {Object} options.bot CurrencyBot object.
  * @param {Object} options.cache CurrencyCache object.
  * @param {Object} options.history CurrencyHistory object.
+ * @param {Object} options.eventdispatcher EventDispatcher object.
  */
 const CrawlerService = class {
   constructor(options) {
@@ -17,6 +18,7 @@ const CrawlerService = class {
     this.bot = options.bot;
     this.cache = options.cache;
     this.history = options.history;
+    this.eventdispatcher = options.eventdispatcher;
   }
 
   /**
@@ -58,6 +60,24 @@ const CrawlerService = class {
   }
 
   /**
+   * Process Line Publish Events.
+   *
+   * @param {Object} events Crawler service events.
+   * @return {Promise}
+   */
+  processLinePublishEvents(events) {
+    let self = this;
+
+    return Promise.resolve()
+      .then(function(data) {
+        return Promise.all(events.map(function(x) {
+            return self.bot.lineBotPublish(self.getCurrencyMsg(JSON.parse(x.Message)));
+          })
+        );
+      });
+  }
+
+  /**
    * Crawling Currency.
    *
    * @param {Array} types Currency types.
@@ -85,7 +105,7 @@ const CrawlerService = class {
           let p = [];
           p.push(self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur));
           p.push(self.cache.put('BOT', cur));
-          p.push(self.bot.lineBotPublish(self.getCurrencyMsg(cur)));
+          p.push(self.eventdispatcher.dispatchCurrencyChangedEvent(cur));
 
           return Promise.all(p);
         }

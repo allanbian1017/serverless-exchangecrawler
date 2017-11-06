@@ -1,0 +1,37 @@
+'use strict';
+
+const AWS = require('aws-sdk');
+const CurrencyBot = require('../lib/currencybot');
+const BotUser = require('../lib/botuser');
+const Config = require('../lib/config');
+const CrawlerService = require('./crawlerservice');
+const line = require('@line/bot-sdk');
+
+exports.main = (event, context, cb) => {
+  console.log(event);
+
+  const s3 = new AWS.S3();
+  const config = Config.get(process.env.AWS_REGION);
+  const client = new line.Client(config.line_config);
+  const botuser = new BotUser({ storage: s3 });
+  const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
+  const service = new CrawlerService({ bot: bot });
+
+  Promise.resolve()
+    .then(function() {
+      let events = event.Records.map(function(x) {
+          return x.Sns;
+        });
+
+      return service.processLinePublishEvents(events);
+    })
+    .then(function() {
+      cb();
+    })
+    .catch(function(err) {
+      console.log(err);
+
+      cb(err);
+    });
+};
+

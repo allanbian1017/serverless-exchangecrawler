@@ -17,8 +17,21 @@ provider:
       Action:
         - s3:GetObject
         - s3:PutObject
-        - s3:HeadObject
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - sns:Publish
+      Resource: "arn:aws:sns:us-east-1:*:*"
+  environment:
+    CURRENCY_CHANGED_SNS_ARN:
+      Fn::Join:
+        - ":"
+        - - arn
+          - aws
+          - sns
+          - Ref: AWS::Region
+          - Ref: AWS::AccountId
+          - currencychanged
 
 resources:
   Resources:
@@ -59,3 +72,7 @@ functions:
           path: history/{date}
           method: get
           cors: true
+  LinePub:
+    handler: src/linepub.main
+    events:
+      - sns: currencychanged
