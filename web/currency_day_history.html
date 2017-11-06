@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <title>Currency History</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	 <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+
+  <body>
+    <p><input type="text" id="date-picker"></p>
+    <p><div class="chart-wrapper"><canvas id="line-chart"></canvas></div></p>
+    <script type="text/javascript">
+          var datePicker = new Pikaday({
+            field: document.getElementById('date-picker'),
+            minDate: new Date(2017, 8, 21),
+            maxDate: new Date(),
+            onSelect: onDateChange
+          });
+
+          var lineChart = new Chart(document.getElementById("line-chart"), {
+            type: 'line',
+            data: {
+              labels: [],
+              datasets: [
+              {
+                data: [],
+                label: 'JPY',
+                borderColor: '#3e95cd',
+                fill: false,
+                hidden: false
+              },
+              {
+                data: [],
+                label: 'USD',
+                borderColor: '#3ecd6d',
+                fill: false,
+                hidden: true
+              },
+              {
+                data: [],
+                label: 'CNY',
+                borderColor: '#cd3e3e',
+                fill: false,
+                hidden: true
+              },
+              {
+                data: [],
+                label: 'KRW',
+                borderColor: '#553ecd',
+                fill: false,
+                hidden: true
+              },
+              {
+                data: [],
+                label: 'EUR',
+                borderColor: '#21c3ef',
+                fill: false,
+                hidden: true
+              }
+              ]
+            },
+            options: {
+              legend: {
+                onClick: function (evt, item) {
+                  let ci = this.chart;
+                  ci.data.datasets.forEach(function(x) {
+                    if (x.label === item.text) {
+                      x.hidden = false;
+                    } else {
+                      x.hidden = true;
+                    }
+                  });
+
+                  ci.update();
+                },
+                display: true
+              }
+            }
+          });
+
+          function cleanData(chart) {
+            chart.data.labels = [];
+            chart.data.datasets.forEach((dataset) => {
+              dataset.data = [];
+            });
+            chart.update();
+          }
+
+          function addLabel(chart, label) {
+            chart.data.labels.push(label);
+          }
+
+          function addData(chart, data, type) {
+            chart.data.datasets.forEach((dataset) => {
+              if (dataset.label === type) {
+                dataset.data.push(data);
+              }
+            });
+            chart.update();
+          }
+
+          function fetchHistory(dates) {
+			Promise.all(dates.map(function(x)  {
+				  var url = 'https://lw4ccxp0og.execute-api.us-east-1.amazonaws.com/dev/history/' + x;
+				  return fetch(url, { method: 'GET' })
+				    .then(function(response) {
+                      return response.json();
+                    });
+			    })
+			  )
+			  .then(function(data) {
+				cleanData(lineChart);
+				var hist = data.filter(function(x) {
+				    return x.History.length != 0;
+				  })
+				  .map(function(x) {
+				    return x.History[x.History.length-1];
+				  });
+				  
+				hist.forEach(function(x) {
+                  var date = moment(x.date).utc().format('MM-DD');
+                  addLabel(lineChart, date);
+
+                  ['JPY', 'USD', 'CNY', 'KRW', 'EUR'].forEach(function(type) {
+                      addData(lineChart, x[type], type);
+                    });
+                });
+			  })
+              .catch(function(err) {
+                console.log(err);
+              });
+          }
+
+          function onDateChange(date) {
+			var from = moment(date);
+			var now = moment();
+			
+			var dates = [];
+			for (var m = from; m.isBefore(now); m.add(1, 'days')) {
+				var day = m.toDate().getDay();
+				var isWeekend = (day == 6) || (day == 0);
+				if (isWeekend === false) {
+					dates.push(m.format('YYYYMMDD'));
+				}
+			}
+			fetchHistory(dates);
+          }
+
+	  document.addEventListener("DOMContentLoaded", function(event) {
+            datePicker.setDate(moment().subtract(7, 'days').format('YYYY-MM-DD'));
+	  });
+    </script>
+  </body>
+</html>
