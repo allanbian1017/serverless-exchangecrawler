@@ -2,7 +2,6 @@
 
 const AWS = require('aws-sdk');
 const CurrencyHistory = require('../lib/currencyhistory');
-const Config = require('../lib/config');
 const CrawlerService = require('./crawlerservice');
 
 exports.main = (event, context, cb) => {
@@ -10,7 +9,6 @@ exports.main = (event, context, cb) => {
 
   const s3 = new AWS.S3();
   const history = new CurrencyHistory({ storage: s3 });
-  const config = Config.get(process.env.AWS_REGION);
   const service = new CrawlerService({ history: history });
   let response = {
     statusCode: 200,

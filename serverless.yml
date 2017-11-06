@@ -32,6 +32,8 @@ provider:
           - Ref: AWS::Region
           - Ref: AWS::AccountId
           - currencychanged
+    LINE_ACCESSTOKEN: ${file(./configs/config.${self:provider.region}.json):LINE.channelAccessToken}
+    LINE_SECRET: ${file(./configs/config.${self:provider.region}.json):LINE.channelSecret}
 
 resources:
   Resources:
