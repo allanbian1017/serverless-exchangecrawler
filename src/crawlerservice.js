@@ -55,7 +55,11 @@ const CrawlerService = class {
         return self.cache.get('BOT');
       })
       .then(function(data) {
-        return self.bot.lineBotHandler(events, { default: self.getCurrencyMsg(data.data) });
+        if (!Object.keys(data).length) {
+          return self.bot.lineBotHandler(events, { default: '您好\n' });
+        } else {
+          return self.bot.lineBotHandler(events, { default: self.getCurrencyMsg(data.data) });
+        }
       });
   }
 
@@ -98,11 +102,20 @@ const CrawlerService = class {
         return Promise.all(p);
       })
       .then(function(data) {
-        let last = data[0].data;
+        let last = data[0];
         let cur = data[1];
+        let p = [];
 
-        if (new Date(cur.date) > new Date(last.date)) {
-          let p = [];
+        if (Object.keys(last).length) {
+          last = last.data;
+          if (new Date(cur.date) > new Date(last.date)) {
+            p.push(self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur));
+            p.push(self.cache.put('BOT', cur));
+            p.push(self.eventdispatcher.dispatchCurrencyChangedEvent(cur));
+
+            return Promise.all(p);
+          }
+        } else {
           p.push(self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur));
           p.push(self.cache.put('BOT', cur));
           p.push(self.eventdispatcher.dispatchCurrencyChangedEvent(cur));
