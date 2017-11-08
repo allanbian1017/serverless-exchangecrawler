@@ -10,8 +10,8 @@
   </head>
 
   <body>
-    <p><input type="text" id="date-picker"></p>
-    <p><div class="chart-wrapper"><canvas id="line-chart"></canvas></div></p>
+    <p><div class="picker-wrapper" align="center"><input type="text" id="date-picker"></div></p>
+    <p><div class="chart-wrapper" style="position: relative; height:70vh; width:100vw"><canvas id="line-chart"></canvas></div></p>
     <script type="text/javascript">
           var datePicker = new Pikaday({
             field: document.getElementById('date-picker'),
@@ -63,6 +63,7 @@
               ]
             },
             options: {
+			  maintainAspectRatio: false,
               legend: {
                 onClick: function (evt, item) {
                   let ci = this.chart;

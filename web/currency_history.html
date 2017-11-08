@@ -5,11 +5,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/pikaday.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pikaday/1.6.1/css/pikaday.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	 <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
 
   <body>
-    <p><input type="text" id="date-picker"></p>
-    <p><div class="chart-wrapper"><canvas id="line-chart" width="undefined" height="undefined"></canvas></div></p>
+    <p><div class="picker-wrapper" align="center"><input type="text" id="date-picker"></div></p>
+    <p><div class="chart-wrapper" style="position: relative; height:70vh; width:100vw"><canvas id="line-chart"></canvas></div></p>
     <script type="text/javascript">
           var datePicker = new Pikaday({
             field: document.getElementById('date-picker'),
@@ -61,6 +63,7 @@
               ]
             },
             options: {
+			  maintainAspectRatio: false,
               legend: {
                 onClick: function (evt, item) {
                   let ci = this.chart;
