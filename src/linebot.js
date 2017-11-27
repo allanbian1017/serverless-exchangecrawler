@@ -9,17 +9,17 @@ const BotUser = require('../lib/botuser');
 const CrawlerService = require('./crawlerservice');
 const line = require('@line/bot-sdk');
 
+const s3 = new AWS.S3();
+const dynamodb = new AWS.DynamoDB.DocumentClient();
+const cache = new CurrencyCache({ db: dynamodb });
+const client = new line.Client({ channelAccessToken: process.env.LINE_ACCESSTOKEN, channelSecret: process.env.LINE_SECRET});
+const botuser = new BotUser({ storage: s3 });
+const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
+const service = new CrawlerService({ bot: bot, cache: cache });
+
 exports.main = (event, context, cb) => {
   console.log(event);
-  console.log(process.env);
 
-  const s3 = new AWS.S3();
-  const dynamodb = new AWS.DynamoDB.DocumentClient();
-  const cache = new CurrencyCache({ db: dynamodb });
-  const client = new line.Client({ channelAccessToken: process.env.LINE_ACCESSTOKEN, channelSecret: process.env.LINE_SECRET});
-  const botuser = new BotUser({ storage: s3 });
-  const bot = new CurrencyBot({ lineclient: client, botuser: botuser });
-  const service = new CrawlerService({ bot: bot, cache: cache });
   const body = JSON.parse(event.body);
   let response = {};
 

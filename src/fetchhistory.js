@@ -6,12 +6,13 @@ const moment = require('moment');
 const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('./crawlerservice');
 
+const s3 = new AWS.S3();
+const history = new CurrencyHistory({ storage: s3 });
+const service = new CrawlerService({ history: history });
+
 exports.main = (event, context, cb) => {
   console.log(event);
 
-  const s3 = new AWS.S3();
-  const history = new CurrencyHistory({ storage: s3 });
-  const service = new CrawlerService({ history: history });
   let response = {
     statusCode: 200,
     headers: {
