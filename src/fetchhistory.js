@@ -1,6 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const moment = require('moment');
 const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('./crawlerservice');
 
@@ -22,6 +23,12 @@ exports.main = (event, context, cb) => {
       return service.fetchHistory(event.pathParameters.date);
     })
     .then(function(data) {
+      if (moment().format('YYYYMMDD') !== event.pathParameters.date) {
+        response.headers['cache-control'] = 'public, max-age=31536000';
+      } else {
+        response.headers['cache-control'] = 'public, max-age=1800';
+      }
+
       response.body = JSON.stringify({ History: data });
       cb(null, response);
     })
