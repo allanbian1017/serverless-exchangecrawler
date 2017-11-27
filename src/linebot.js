@@ -1,6 +1,7 @@
 'use strict';
 
-const AWS = require('aws-sdk');
+const awsXRay = require('aws-xray-sdk');
+const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const HttpClient = require('../lib/httpclient');
 const CurrencyCache = require('../lib/currencycache');
 const CurrencyBot = require('../lib/currencybot');

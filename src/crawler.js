@@ -1,12 +1,14 @@
 'use strict';
 
-const AWS = require('aws-sdk');
+const awsXRay = require('aws-xray-sdk');
+const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const HttpClient = require('../lib/httpclient');
 const CurrencySource = require('../lib/currencysource');
 const CurrencyCache = require('../lib/currencycache');
 const CurrencyHistory = require('../lib/currencyhistory');
 const EventDispatcher = require('../lib/eventdispatcher');
 const CrawlerService = require('./crawlerservice');
+
 
 exports.main = (event, context, cb) => {
   console.log(event);

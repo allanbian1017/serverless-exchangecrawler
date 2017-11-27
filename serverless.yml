@@ -6,6 +6,7 @@ provider:
   stage: dev
   region: us-east-1
   memorySize: 256
+  tracing: true
   versionFunctions: false
   iamRoleStatements:
     - Effect: Allow
@@ -22,6 +23,12 @@ provider:
       Action:
         - sns:Publish
       Resource: "arn:aws:sns:us-east-1:*:*"
+    - Effect: Allow
+      Action:
+        - xray:PutTraceSegments
+        - xray:PutTelemetryRecords
+      Resource: "*"
+
   environment:
     CURRENCY_CHANGED_SNS_ARN:
       Fn::Join:
@@ -34,6 +41,9 @@ provider:
           - currencychanged
     LINE_ACCESSTOKEN: ${file(./configs/config.${self:provider.region}.json):LINE.channelAccessToken}
     LINE_SECRET: ${file(./configs/config.${self:provider.region}.json):LINE.channelSecret}
+
+plugins:
+  - serverless-plugin-tracing
 
 resources:
   Resources:
