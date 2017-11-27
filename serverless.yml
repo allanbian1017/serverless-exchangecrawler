@@ -42,6 +42,11 @@ provider:
     LINE_ACCESSTOKEN: ${file(./configs/config.${self:provider.region}.json):LINE.channelAccessToken}
     LINE_SECRET: ${file(./configs/config.${self:provider.region}.json):LINE.channelSecret}
 
+package:
+  individually: true
+  exclude:
+    - ./**
+
 plugins:
   - serverless-plugin-tracing
 
@@ -68,17 +73,42 @@ resources:
 functions:
   LineBot:
     handler: src/linebot.main
+    package:
+      include:
+          - ./src/linebot.js
+          - ./src/crawlerservice.js
+          - ./lib/**
+          - ./node_modules/aws-xray-sdk/**
+          - ./node_modules/request/**
+          - ./node_modules/moment/**
+          - ./node_modules/@line/**
     events:
       - http:
           path: bot/line
           method: post
   Crawler:
     handler: src/crawler.main
+    package:
+      include:
+          - ./src/crawler.js
+          - ./src/crawlerservice.js
+          - ./lib/**
+          - ./node_modules/aws-xray-sdk/**
+          - ./node_modules/request/**
+          - ./node_modules/moment/**
     events:
       - schedule:
           rate: rate(1 hour)
   FetchHistory:
     handler: src/fetchhistory.main
+    package:
+      include:
+          - ./src/fetchhistory.js
+          - ./src/crawlerservice.js
+          - ./lib/**
+          - ./node_modules/aws-xray-sdk/**
+          - ./node_modules/request/**
+          - ./node_modules/moment/**
     events:
       - http:
           path: history/{date}
@@ -86,5 +116,13 @@ functions:
           cors: true
   LinePub:
     handler: src/linepub.main
+    package:
+      include:
+          - ./src/linepub.js
+          - ./src/crawlerservice.js
+          - ./lib/**
+          - ./node_modules/aws-xray-sdk/**
+          - ./node_modules/request/**
+          - ./node_modules/moment/**
     events:
       - sns: currencychanged
