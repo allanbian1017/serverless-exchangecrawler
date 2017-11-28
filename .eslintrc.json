@@ -1,0 +1,10 @@
+{
+    "extends": "google",
+    "rules": {
+        "semi": [2, "always"],
+        "linebreak-style": ["error", "windows"]
+    },
+    "parserOptions": {
+        "ecmaVersion": 6
+    }
+}
