@@ -14,7 +14,7 @@ describe('Currency', function() {
 
   before(function() {
     client = new HttpClient();
-    src = new CurrencySource({ client: client });
+    src = new CurrencySource({client: client});
   });
 
   describe('#query()', function() {
@@ -30,14 +30,14 @@ describe('Currency', function() {
 
     it('should get USD exchange rate information', function() {
       const expectUSD = 30.312;
-      let fixedObj = { body: fixedBody, headers: {} };
+      let fixedObj = {body: fixedBody, headers: {}};
       fixedObj.headers['content-disposition'] = fixedContentHeaders;
-      
+
       sandbox.stub(client, 'get')
         .withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day').resolves(fixedObj)
         .withArgs().resolves();
 
-      return src.query({ types: ['USD'] })
+      return src.query({types: ['USD']})
         .then(function(data) {
           data.should.have.property('USD', expectUSD);
           return Promise.resolve();

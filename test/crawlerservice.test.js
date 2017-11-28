@@ -16,12 +16,18 @@ describe('CrawlerService', function() {
   let service;
 
   before(function() {
-    src = new CurrencySource({ client: '' });
-    cache = new CurrencyCache({ db: '' });
-    bot = new CurrencyBot({ lineclient: '', botuser: '' });
-    history = new CurrencyHistory({ storage: '' });
-    eventdispatcher = new EventDispatcher({ sns: '', arns: '' });
-    service = new CrawlerService({ bot: bot, cache: cache, src: src, history: history, eventdispatcher: eventdispatcher });
+    src = new CurrencySource({client: ''});
+    cache = new CurrencyCache({db: ''});
+    bot = new CurrencyBot({lineclient: '', botuser: ''});
+    history = new CurrencyHistory({storage: ''});
+    eventdispatcher = new EventDispatcher({sns: '', arns: ''});
+    service = new CrawlerService({
+      bot: bot,
+      cache: cache,
+      src: src,
+      history: history,
+      eventdispatcher: eventdispatcher,
+    });
   });
 
   describe('#processLineEvents()', function() {
@@ -50,26 +56,26 @@ describe('CrawlerService', function() {
           USD: 30,
           JPY: 0.27,
           AUD: 22,
-          CNY: 4.5
-        }
+          CNY: 4.5,
+        },
       };
        const testBody = {
         events: [
           {
-            "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
-            "type": "message",
-            "timestamp": 1462629479859,
-            "source": {
-              "type": "user",
-              "userId": "U206d25c2ea6bd87c17655609a1c37cb8"
+            'replyToken': 'nHuyWiB7yP5Zw52FIkcQobQuGDXCTA',
+            'type': 'message',
+            'timestamp': 1462629479859,
+            'source': {
+              'type': 'user',
+              'userId': 'U206d25c2ea6bd87c17655609a1c37cb8',
             },
-            "message": {
-              "id": "325708",
-              "type": "text",
-              "text": "Hello, world"
-            }
-          }
-        ]
+            'message': {
+              'id': '325708',
+              'type': 'text',
+              'text': 'Hello, world',
+            },
+          },
+        ],
       };
       sandbox.stub(cache, 'get')
         .withArgs('BOT').resolves(testHist)
@@ -107,8 +113,8 @@ describe('CrawlerService', function() {
           USD: 30,
           JPY: 0.27,
           AUD: 22,
-          CNY: 4.5
-        }
+          CNY: 4.5,
+        },
       };
 
       const testCur = {
@@ -116,11 +122,11 @@ describe('CrawlerService', function() {
         USD: 30,
         JPY: 0.27,
         AUD: 22,
-        CNY: 4.5
+        CNY: 4.5,
       };
 
       sandbox.stub(src, 'query')
-        .withArgs({ types: testTypes }).resolves(testCur)
+        .withArgs({types: testTypes}).resolves(testCur)
         .withArgs().rejects();
       sandbox.stub(cache, 'get')
         .withArgs('BOT').resolves(testHist)
@@ -169,9 +175,9 @@ describe('CrawlerService', function() {
             USD: 30,
             JPY: 0.27,
             AUD: 22,
-            CNY: 4.5
-          })
-        }
+            CNY: 4.5,
+          }),
+        },
       ];
 
       sandbox.mock(bot)

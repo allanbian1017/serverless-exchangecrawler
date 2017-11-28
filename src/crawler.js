@@ -13,11 +13,19 @@ const sns = new AWS.SNS();
 const s3 = new AWS.S3();
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const httpclient = new HttpClient();
-const src = new CurrencySource({ client: httpclient });
-const cache = new CurrencyCache({ db: dynamodb });
-const history = new CurrencyHistory({ storage: s3 });
-const eventdispatcher = new EventDispatcher({ sns: sns, arns: {currencychanged: process.env.CURRENCY_CHANGED_SNS_ARN} });
-const service = new CrawlerService({ cache: cache, src: src, history: history, eventdispatcher: eventdispatcher });
+const src = new CurrencySource({client: httpclient});
+const cache = new CurrencyCache({db: dynamodb});
+const history = new CurrencyHistory({storage: s3});
+const eventdispatcher = new EventDispatcher({
+  sns: sns,
+  arns: {currencychanged: process.env.CURRENCY_CHANGED_SNS_ARN},
+});
+const service = new CrawlerService({
+  cache: cache,
+  src: src,
+  history: history,
+  eventdispatcher: eventdispatcher,
+});
 
 exports.main = (event, context, cb) => {
   console.log(event);

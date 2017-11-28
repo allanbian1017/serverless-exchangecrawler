@@ -7,8 +7,8 @@ const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('./crawlerservice');
 
 const s3 = new AWS.S3();
-const history = new CurrencyHistory({ storage: s3 });
-const service = new CrawlerService({ history: history });
+const history = new CurrencyHistory({storage: s3});
+const service = new CrawlerService({history: history});
 
 exports.main = (event, context, cb) => {
   console.log(event);
@@ -16,8 +16,8 @@ exports.main = (event, context, cb) => {
   let response = {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin' : '*'
-    }
+      'Access-Control-Allow-Origin': '*',
+    },
   };
 
   Promise.resolve()
@@ -31,7 +31,7 @@ exports.main = (event, context, cb) => {
         response.headers['cache-control'] = 'public, max-age=1800';
       }
 
-      response.body = JSON.stringify({ History: data });
+      response.body = JSON.stringify({History: data});
       cb(null, response);
     })
     .catch(function(err) {
