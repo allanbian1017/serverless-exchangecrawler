@@ -124,5 +124,6 @@ functions:
           - ./node_modules/aws-xray-sdk/**
           - ./node_modules/request/**
           - ./node_modules/moment/**
+          - ./node_modules/@line/**
     events:
       - sns: currencychanged
