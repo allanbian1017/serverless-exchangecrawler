@@ -2,7 +2,8 @@
     "extends": "google",
     "rules": {
         "semi": "error",
-        "linebreak-style": ["error", "windows"]
+        "linebreak-style": ["error", "windows"],
+        "no-unused-vars": ["error", { "varsIgnorePattern": "should" }]
     },
     "env": {
         "node": true,
