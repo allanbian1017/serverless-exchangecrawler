@@ -61,7 +61,7 @@ describe('CurrencyBot', function() {
         );
 
       return bot.lineBotHandler(testBody, {default: expectMsg})
-        .then(function(data) {
+        .then(function() {
           sandbox.verify();
           return Promise.resolve();
         });

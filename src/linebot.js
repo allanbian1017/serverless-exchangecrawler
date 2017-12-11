@@ -48,7 +48,7 @@ exports.main = (event, context, cb) => {
     .then(function() {
       return service.processLineEvents(body);
     })
-    .then(function(data) {
+    .then(function() {
       response.statusCode = 200;
       cb(null, response);
     })

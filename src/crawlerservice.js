@@ -22,7 +22,10 @@ const CrawlerService = class {
   }
 
   /**
-   * @api private
+   * @private
+   *
+   * @argument {Object} data Currency data.
+   * @return {String}
    */
   getCurrencyMsg(data) {
     let msg = '您好\n';
@@ -79,7 +82,7 @@ const CrawlerService = class {
     let self = this;
 
     return Promise.resolve()
-      .then(function(data) {
+      .then(function() {
         return Promise.all(events.map(function(x) {
             return self.bot.lineBotPublish(
               self.getCurrencyMsg(JSON.parse(x.Message))

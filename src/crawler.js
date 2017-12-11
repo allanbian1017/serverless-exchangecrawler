@@ -36,7 +36,7 @@ exports.main = (event, context, cb) => {
     .then(function() {
       return service.crawlingCurrency(types);
     })
-    .then(function(data) {
+    .then(function() {
       cb();
     })
     .catch(function(err) {

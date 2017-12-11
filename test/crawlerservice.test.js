@@ -85,7 +85,7 @@ describe('CrawlerService', function() {
         .withArgs(testBody, {default: expectMsg});
 
       return service.processLineEvents(testBody)
-        .then(function(data) {
+        .then(function() {
           sandbox.verify();
           return Promise.resolve();
         });
@@ -142,7 +142,7 @@ describe('CrawlerService', function() {
         .withArgs(testCur);
 
       return service.crawlingCurrency(testTypes)
-        .then(function(data) {
+        .then(function() {
           sandbox.verify();
           return Promise.resolve();
         });
@@ -185,7 +185,7 @@ describe('CrawlerService', function() {
         .withArgs(expectMsg);
 
       return service.processLinePublishEvents(testEvents)
-        .then(function(data) {
+        .then(function() {
           sandbox.verify();
           return Promise.resolve();
         });
