@@ -1,0 +1,36 @@
+
+image: node:6.10.3
+
+stages:
+  - build
+  - test
+  - deploy
+
+cache:
+  key: "$CI_PROJECT_ID"
+  untracked: true
+  paths:
+    - node_modules
+
+run_build:
+  stage: build
+  script:
+    - npm install
+
+run_lint:
+  stage: test
+  script:
+    - npm run lint
+
+run_test:
+  stage: test
+  script:
+    - npm test
+
+deploy_production:
+  stage: deploy
+  script:
+    - npm install -g serverless
+    - sls deploy
+  only:
+    - master
