@@ -39,8 +39,6 @@ provider:
           - Ref: AWS::Region
           - Ref: AWS::AccountId
           - currencychanged
-    LINE_ACCESSTOKEN: ${file(./configs/config.${self:provider.region}.json):LINE.channelAccessToken}
-    LINE_SECRET: ${file(./configs/config.${self:provider.region}.json):LINE.channelSecret}
 
 package:
   individually: true
@@ -86,6 +84,9 @@ functions:
       - http:
           path: bot/line
           method: post
+    environment:
+      LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
+      LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}
   Crawler:
     handler: src/crawler.main
     package:
@@ -127,3 +128,6 @@ functions:
           - ./node_modules/@line/**
     events:
       - sns: currencychanged
+    environment:
+      LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
+      LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}
