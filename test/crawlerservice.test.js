@@ -92,6 +92,49 @@ describe('CrawlerService', function() {
     });
   });
 
+  describe('#processLinePublishEvents()', function() {
+    let sandbox;
+
+    beforeEach(function() {
+      sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
+    });
+
+    it('should execute success without error', function() {
+      const expectMsg = '您好\n' +
+                '美金匯率30\n' +
+                '日元匯率0.27\n' +
+                '澳幣匯率22\n' +
+                '人民幣匯率4.5\n' +
+                '更新時間:2017-09-20 10:04\n' +
+                '供您参考';
+      const testEvents = [
+        {
+          Message: JSON.stringify({
+            date: '2017-09-20T14:04:00+00:00',
+            USD: 30,
+            JPY: 0.27,
+            AUD: 22,
+            CNY: 4.5,
+          }),
+        },
+      ];
+
+      sandbox.mock(bot)
+        .expects('lineBotPublish').once()
+        .withArgs(expectMsg);
+
+      return service.processLinePublishEvents(testEvents)
+        .then(function() {
+          sandbox.verify();
+          return Promise.resolve();
+        });
+    });
+  });
+
   describe('#crawlingCurrency()', function() {
     let sandbox;
 
@@ -149,7 +192,7 @@ describe('CrawlerService', function() {
     });
   });
 
-  describe('#processLinePublishEvents()', function() {
+  describe('#fetchHistory()', function() {
     let sandbox;
 
     beforeEach(function() {
@@ -161,14 +204,8 @@ describe('CrawlerService', function() {
     });
 
     it('should execute success without error', function() {
-      const expectMsg = '您好\n' +
-                '美金匯率30\n' +
-                '日元匯率0.27\n' +
-                '澳幣匯率22\n' +
-                '人民幣匯率4.5\n' +
-                '更新時間:2017-09-20 10:04\n' +
-                '供您参考';
-      const testEvents = [
+      const testDate = '20170920';
+      const expectData = [
         {
           Message: JSON.stringify({
             date: '2017-09-20T14:04:00+00:00',
@@ -180,13 +217,13 @@ describe('CrawlerService', function() {
         },
       ];
 
-      sandbox.mock(bot)
-        .expects('lineBotPublish').once()
-        .withArgs(expectMsg);
+      sandbox.stub(history, 'get')
+        .withArgs('BOT', testDate).resolves(expectData)
+        .withArgs().rejects();
 
-      return service.processLinePublishEvents(testEvents)
-        .then(function() {
-          sandbox.verify();
+      return service.fetchHistory(testDate)
+        .then(function(data) {
+          data.should.be.exactly(expectData);
           return Promise.resolve();
         });
     });
