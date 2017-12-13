@@ -39,7 +39,11 @@ const CrawlerService = class {
     if (data.GBP) msg += '英鎊匯率' + data.GBP + '\n';
     if (data.HKD) msg += '港幣匯率' + data.HKD + '\n';
 
-    msg += '更新時間:' + moment(data.date).format('YYYY-MM-DD hh:mm') + '\n';
+    msg += '更新時間:' +
+      moment(data.date)
+        .utcOffset('+0800')
+        .format('YYYY-MM-DD hh:mm') +
+      '\n';
     msg += '供您参考';
     return msg;
   }
