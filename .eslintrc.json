@@ -2,7 +2,7 @@
     "extends": "google",
     "rules": {
         "semi": "error",
-        "linebreak-style": ["error", "windows"],
+        "linebreak-style": "off",
         "no-unused-vars": ["error", { "varsIgnorePattern": "should" }]
     },
     "env": {
