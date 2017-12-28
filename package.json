@@ -19,6 +19,7 @@
     "eslint-config-google": "^0.9.1",
     "mocha": "^3.4.1",
     "nyc": "^11.3.0",
+    "serverless-plugin-browserifier": "^1.0.5",
     "serverless-plugin-tracing": "^2.0.0",
     "should": "^11.2.1",
     "sinon": "^2.2.0"
