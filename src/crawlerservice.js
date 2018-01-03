@@ -4,15 +4,15 @@ const moment = require('moment');
 
 const CrawlerService = class {
   /**
-  * Constructor for CrawlerService object.
-  *
-  * @param {Object} options JSON configuration.
-  * @param {Object} options.src CurrencySource object.
-  * @param {Object} options.bot CurrencyBot object.
-  * @param {Object} options.cache CurrencyCache object.
-  * @param {Object} options.history CurrencyHistory object.
-  * @param {Object} options.eventdispatcher EventDispatcher object.
-  */
+   * Constructor for CrawlerService object.
+   *
+   * @param {Object} options JSON configuration.
+   * @param {Object} options.src CurrencySource object.
+   * @param {Object} options.bot CurrencyBot object.
+   * @param {Object} options.cache CurrencyCache object.
+   * @param {Object} options.history CurrencyHistory object.
+   * @param {Object} options.eventdispatcher EventDispatcher object.
+   */
   constructor(options) {
     this.src = options.src;
     this.bot = options.bot;
@@ -39,7 +39,8 @@ const CrawlerService = class {
     if (data.GBP) msg += '英鎊匯率' + data.GBP + '\n';
     if (data.HKD) msg += '港幣匯率' + data.HKD + '\n';
 
-    msg += '更新時間:' +
+    msg +=
+      '更新時間:' +
       moment(data.date)
         .utcOffset('+0800')
         .format('YYYY-MM-DD hh:mm') +
@@ -63,15 +64,38 @@ const CrawlerService = class {
       })
       .then(function(data) {
         if (!Object.keys(data).length) {
-          return self.bot.lineBotHandler(
-            events,
-            {default: '您好\n'}
-          );
+          return self.bot.lineBotHandler(events, {default: '您好\n'});
         } else {
-          return self.bot.lineBotHandler(
-            events,
-            {default: self.getCurrencyMsg(data.data)}
-          );
+          return self.bot.lineBotHandler(events, {
+            default: self.getCurrencyMsg(data.data),
+          });
+        }
+      });
+  }
+
+  /**
+   * Query Currency.
+   *
+   * @param {Array} types Currency types.
+   * @return {Promise}
+   */
+  queryCurrency(types) {
+    let self = this;
+
+    return Promise.resolve()
+      .then(function() {
+        return self.cache.get('BOT');
+      })
+      .then(function(data) {
+        if (!Object.keys(data).length) {
+          return Promise.resolve({text: '您好\n'});
+        } else {
+          let result = {};
+          result.date = data.data.date;
+          types.forEach(function(x) {
+            result[x] = data.data[x];
+          });
+          return Promise.resolve({text: self.getCurrencyMsg(result)});
         }
       });
   }
@@ -85,15 +109,15 @@ const CrawlerService = class {
   processLinePublishEvents(events) {
     let self = this;
 
-    return Promise.resolve()
-      .then(function() {
-        return Promise.all(events.map(function(x) {
-            return self.bot.lineBotPublish(
-              self.getCurrencyMsg(JSON.parse(x.Message))
-            );
-          })
-        );
-      });
+    return Promise.resolve().then(function() {
+      return Promise.all(
+        events.map(function(x) {
+          return self.bot.lineBotPublish(
+            self.getCurrencyMsg(JSON.parse(x.Message))
+          );
+        })
+      );
+    });
   }
 
   /**
@@ -155,10 +179,9 @@ const CrawlerService = class {
   fetchHistory(date) {
     let self = this;
 
-    return Promise.resolve()
-      .then(function() {
-        return self.history.get('BOT', date);
-      });
+    return Promise.resolve().then(function() {
+      return self.history.get('BOT', date);
+    });
   }
 };
 

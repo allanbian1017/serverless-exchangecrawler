@@ -96,3 +96,9 @@ functions:
     environment:
       LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
       LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}
+  Bot:
+    handler: src/bot.main
+    events:
+      - http:
+          path: bot/
+          method: post

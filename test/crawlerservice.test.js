@@ -42,13 +42,14 @@ describe('CrawlerService', function() {
     });
 
     it('should execute success without error', function() {
-      const expectMsg = '您好\n' +
-                '美金匯率30\n' +
-                '日元匯率0.27\n' +
-                '澳幣匯率22\n' +
-                '人民幣匯率4.5\n' +
-                '更新時間:2017-09-20 10:04\n' +
-                '供您参考';
+      const expectMsg =
+        '您好\n' +
+        '美金匯率30\n' +
+        '日元匯率0.27\n' +
+        '澳幣匯率22\n' +
+        '人民幣匯率4.5\n' +
+        '更新時間:2017-09-20 10:04\n' +
+        '供您参考';
       const testHist = {
         bank: 'BOT',
         data: {
@@ -59,36 +60,40 @@ describe('CrawlerService', function() {
           CNY: 4.5,
         },
       };
-       const testBody = {
+      const testBody = {
         events: [
           {
-            'replyToken': 'nHuyWiB7yP5Zw52FIkcQobQuGDXCTA',
-            'type': 'message',
-            'timestamp': 1462629479859,
-            'source': {
-              'type': 'user',
-              'userId': 'U206d25c2ea6bd87c17655609a1c37cb8',
+            replyToken: 'nHuyWiB7yP5Zw52FIkcQobQuGDXCTA',
+            type: 'message',
+            timestamp: 1462629479859,
+            source: {
+              type: 'user',
+              userId: 'U206d25c2ea6bd87c17655609a1c37cb8',
             },
-            'message': {
-              'id': '325708',
-              'type': 'text',
-              'text': 'Hello, world',
+            message: {
+              id: '325708',
+              type: 'text',
+              text: 'Hello, world',
             },
           },
         ],
       };
-      sandbox.stub(cache, 'get')
-        .withArgs('BOT').resolves(testHist)
-        .withArgs().rejects();
-      sandbox.mock(bot)
-        .expects('lineBotHandler').once()
+      sandbox
+        .stub(cache, 'get')
+        .withArgs('BOT')
+        .resolves(testHist)
+        .withArgs()
+        .rejects();
+      sandbox
+        .mock(bot)
+        .expects('lineBotHandler')
+        .once()
         .withArgs(testBody, {default: expectMsg});
 
-      return service.processLineEvents(testBody)
-        .then(function() {
-          sandbox.verify();
-          return Promise.resolve();
-        });
+      return service.processLineEvents(testBody).then(function() {
+        sandbox.verify();
+        return Promise.resolve();
+      });
     });
   });
 
@@ -104,13 +109,14 @@ describe('CrawlerService', function() {
     });
 
     it('should execute success without error', function() {
-      const expectMsg = '您好\n' +
-                '美金匯率30\n' +
-                '日元匯率0.27\n' +
-                '澳幣匯率22\n' +
-                '人民幣匯率4.5\n' +
-                '更新時間:2017-09-20 10:04\n' +
-                '供您参考';
+      const expectMsg =
+        '您好\n' +
+        '美金匯率30\n' +
+        '日元匯率0.27\n' +
+        '澳幣匯率22\n' +
+        '人民幣匯率4.5\n' +
+        '更新時間:2017-09-20 10:04\n' +
+        '供您参考';
       const testEvents = [
         {
           Message: JSON.stringify({
@@ -123,15 +129,56 @@ describe('CrawlerService', function() {
         },
       ];
 
-      sandbox.mock(bot)
-        .expects('lineBotPublish').once()
+      sandbox
+        .mock(bot)
+        .expects('lineBotPublish')
+        .once()
         .withArgs(expectMsg);
 
-      return service.processLinePublishEvents(testEvents)
-        .then(function() {
-          sandbox.verify();
-          return Promise.resolve();
-        });
+      return service.processLinePublishEvents(testEvents).then(function() {
+        sandbox.verify();
+        return Promise.resolve();
+      });
+    });
+  });
+
+  describe('#queryCurrency()', function() {
+    let sandbox;
+
+    beforeEach(function() {
+      sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
+    });
+
+    it('should execute success without error', function() {
+      const testTypes = ['USD'];
+      const expectMsg =
+        '您好\n' + '美金匯率30\n' + '更新時間:2017-09-20 10:04\n' + '供您参考';
+      const testHist = {
+        bank: 'BOT',
+        data: {
+          date: '2017-09-20T14:04:00+00:00',
+          USD: 30,
+          JPY: 0.27,
+          AUD: 22,
+          CNY: 4.5,
+        },
+      };
+
+      sandbox
+        .stub(cache, 'get')
+        .withArgs('BOT')
+        .resolves(testHist)
+        .withArgs()
+        .rejects();
+
+      return service.queryCurrency(testTypes).then(function(data) {
+        data.text.should.be.exactly(expectMsg);
+        return Promise.resolve();
+      });
     });
   });
 
@@ -168,27 +215,38 @@ describe('CrawlerService', function() {
         CNY: 4.5,
       };
 
-      sandbox.stub(src, 'query')
-        .withArgs({types: testTypes}).resolves(testCur)
-        .withArgs().rejects();
-      sandbox.stub(cache, 'get')
-        .withArgs('BOT').resolves(testHist)
-        .withArgs().rejects();
-      sandbox.mock(history)
-        .expects('add').once()
+      sandbox
+        .stub(src, 'query')
+        .withArgs({types: testTypes})
+        .resolves(testCur)
+        .withArgs()
+        .rejects();
+      sandbox
+        .stub(cache, 'get')
+        .withArgs('BOT')
+        .resolves(testHist)
+        .withArgs()
+        .rejects();
+      sandbox
+        .mock(history)
+        .expects('add')
+        .once()
         .withArgs('BOT', expectDate, testCur);
-      sandbox.mock(cache)
-        .expects('put').once()
+      sandbox
+        .mock(cache)
+        .expects('put')
+        .once()
         .withArgs('BOT', testCur);
-      sandbox.mock(eventdispatcher)
-        .expects('dispatchCurrencyChangedEvent').once()
+      sandbox
+        .mock(eventdispatcher)
+        .expects('dispatchCurrencyChangedEvent')
+        .once()
         .withArgs(testCur);
 
-      return service.crawlingCurrency(testTypes)
-        .then(function() {
-          sandbox.verify();
-          return Promise.resolve();
-        });
+      return service.crawlingCurrency(testTypes).then(function() {
+        sandbox.verify();
+        return Promise.resolve();
+      });
     });
   });
 
@@ -217,15 +275,17 @@ describe('CrawlerService', function() {
         },
       ];
 
-      sandbox.stub(history, 'get')
-        .withArgs('BOT', testDate).resolves(expectData)
-        .withArgs().rejects();
+      sandbox
+        .stub(history, 'get')
+        .withArgs('BOT', testDate)
+        .resolves(expectData)
+        .withArgs()
+        .rejects();
 
-      return service.fetchHistory(testDate)
-        .then(function(data) {
-          data.should.be.exactly(expectData);
-          return Promise.resolve();
-        });
+      return service.fetchHistory(testDate).then(function(data) {
+        data.should.be.exactly(expectData);
+        return Promise.resolve();
+      });
     });
   });
 });
