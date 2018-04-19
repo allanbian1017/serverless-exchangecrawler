@@ -1,7 +1,7 @@
 const CurrencySource = require('../lib/currencysource');
 const CurrencyCache = require('../lib/currencycache');
-const CurrencyBot = require('../lib/currencybot');
 const CurrencyHistory = require('../lib/currencyhistory');
+const LineBot = require('../lib/linebot');
 const EventDispatcher = require('../lib/eventdispatcher');
 const CrawlerService = require('../src/crawlerservice');
 const should = require('should');
@@ -18,7 +18,7 @@ describe('CrawlerService', function() {
   before(function() {
     src = new CurrencySource({client: ''});
     cache = new CurrencyCache({db: ''});
-    bot = new CurrencyBot({lineclient: '', botuser: ''});
+    bot = new LineBot({lineclient: '', botuser: ''});
     history = new CurrencyHistory({storage: ''});
     eventdispatcher = new EventDispatcher({sns: '', arns: ''});
     service = new CrawlerService({
@@ -30,74 +30,7 @@ describe('CrawlerService', function() {
     });
   });
 
-  describe('#processLineEvents()', function() {
-    let sandbox;
-
-    beforeEach(function() {
-      sandbox = sinon.sandbox.create();
-    });
-
-    afterEach(function() {
-      sandbox.restore();
-    });
-
-    it('should execute success without error', function() {
-      const expectMsg =
-        '您好\n' +
-        '美金匯率30\n' +
-        '日元匯率0.27\n' +
-        '澳幣匯率22\n' +
-        '人民幣匯率4.5\n' +
-        '更新時間:2017-09-20 10:04\n' +
-        '供您参考';
-      const testHist = {
-        bank: 'BOT',
-        data: {
-          date: '2017-09-20T14:04:00+00:00',
-          USD: 30,
-          JPY: 0.27,
-          AUD: 22,
-          CNY: 4.5,
-        },
-      };
-      const testBody = {
-        events: [
-          {
-            replyToken: 'nHuyWiB7yP5Zw52FIkcQobQuGDXCTA',
-            type: 'message',
-            timestamp: 1462629479859,
-            source: {
-              type: 'user',
-              userId: 'U206d25c2ea6bd87c17655609a1c37cb8',
-            },
-            message: {
-              id: '325708',
-              type: 'text',
-              text: 'Hello, world',
-            },
-          },
-        ],
-      };
-      sandbox
-        .stub(cache, 'get')
-        .withArgs('BOT')
-        .resolves(testHist)
-        .withArgs()
-        .rejects();
-      sandbox
-        .mock(bot)
-        .expects('lineBotHandler')
-        .once()
-        .withArgs(testBody, {default: expectMsg});
-
-      return service.processLineEvents(testBody).then(function() {
-        sandbox.verify();
-        return Promise.resolve();
-      });
-    });
-  });
-
-  describe('#processLinePublishEvents()', function() {
+  describe('#publishEvents()', function() {
     let sandbox;
 
     beforeEach(function() {
@@ -131,11 +64,11 @@ describe('CrawlerService', function() {
 
       sandbox
         .mock(bot)
-        .expects('lineBotPublish')
+        .expects('publish')
         .once()
         .withArgs(expectMsg);
 
-      return service.processLinePublishEvents(testEvents).then(function() {
+      return service.publishEvents(testEvents).then(function() {
         sandbox.verify();
         return Promise.resolve();
       });

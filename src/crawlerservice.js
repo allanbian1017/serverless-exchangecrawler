@@ -50,30 +50,6 @@ const CrawlerService = class {
   }
 
   /**
-   * Process Line Events.
-   *
-   * @param {Object} events Line bot events.
-   * @return {Promise}
-   */
-  processLineEvents(events) {
-    let self = this;
-
-    return Promise.resolve()
-      .then(function() {
-        return self.cache.get('BOT');
-      })
-      .then(function(data) {
-        if (!Object.keys(data).length) {
-          return self.bot.lineBotHandler(events, {default: '您好\n'});
-        } else {
-          return self.bot.lineBotHandler(events, {
-            default: self.getCurrencyMsg(data.data),
-          });
-        }
-      });
-  }
-
-  /**
    * Query Currency.
    *
    * @param {Array} types Currency types.
@@ -101,18 +77,18 @@ const CrawlerService = class {
   }
 
   /**
-   * Process Line Publish Events.
+   * Publish Events.
    *
    * @param {Object} events Crawler service events.
    * @return {Promise}
    */
-  processLinePublishEvents(events) {
+  publishEvents(events) {
     let self = this;
 
     return Promise.resolve().then(function() {
       return Promise.all(
         events.map(function(x) {
-          return self.bot.lineBotPublish(
+          return self.bot.publish(
             self.getCurrencyMsg(JSON.parse(x.Message))
           );
         })

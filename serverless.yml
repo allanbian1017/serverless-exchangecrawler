@@ -68,15 +68,6 @@ resources:
         BucketName: currencybucket
 
 functions:
-  LineBot:
-    handler: src/linebot.main
-    events:
-      - http:
-          path: bot/line
-          method: post
-    environment:
-      LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
-      LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}
   Crawler:
     handler: src/crawler.main
     events:

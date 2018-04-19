@@ -2,7 +2,7 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
-const CurrencyBot = require('../lib/currencybot');
+const LineBot = require('../lib/linebot');
 const BotUser = require('../lib/botuser');
 const CrawlerService = require('./crawlerservice');
 const line = require('@line/bot-sdk');
@@ -13,7 +13,7 @@ const client = new line.Client({
   channelAccessToken: process.env.LINE_ACCESSTOKEN,
   channelSecret: process.env.LINE_SECRET,
 });
-const bot = new CurrencyBot({
+const bot = new LineBot({
   lineclient: client,
   botuser: botuser,
 });
@@ -28,7 +28,7 @@ exports.main = (event, context, cb) => {
           return x.Sns;
         });
 
-      return service.processLinePublishEvents(events);
+      return service.publishEvents(events);
     })
     .then(function() {
       cb();
