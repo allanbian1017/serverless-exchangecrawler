@@ -12,6 +12,7 @@ const CrawlerService = class {
    * @param {Object} options.cache CurrencyCache object.
    * @param {Object} options.history CurrencyHistory object.
    * @param {Object} options.eventdispatcher EventDispatcher object.
+   * @param {Object} options.botuser BotUser object.
    */
   constructor(options) {
     this.src = options.src;
@@ -19,6 +20,7 @@ const CrawlerService = class {
     this.cache = options.cache;
     this.history = options.history;
     this.eventdispatcher = options.eventdispatcher;
+    this.botuser = options.botuser;
   }
 
   /**
@@ -88,9 +90,7 @@ const CrawlerService = class {
     return Promise.resolve().then(function() {
       return Promise.all(
         events.map(function(x) {
-          return self.bot.publish(
-            self.getCurrencyMsg(JSON.parse(x.Message))
-          );
+          return self.bot.publish(self.getCurrencyMsg(JSON.parse(x.Message)));
         })
       );
     });
@@ -157,6 +157,36 @@ const CrawlerService = class {
 
     return Promise.resolve().then(function() {
       return self.history.get('BOT', date);
+    });
+  }
+
+  /**
+   * Add subscribe user.
+   *
+   * @param {String} plat Bot platform.
+   * @param {String} userId User ID.
+   * @return {Promise}
+   */
+  addSubscribeUser(plat, userId) {
+    let self = this;
+
+    return Promise.resolve().then(function() {
+      return self.botuser.add(plat, userId);
+    });
+  }
+
+  /**
+   * Delete subscribe user.
+   *
+   * @param {String} plat Bot platform.
+   * @param {String} userId User ID.
+   * @return {Promise}
+   */
+  delSubscribeUser(plat, userId) {
+    let self = this;
+
+    return Promise.resolve().then(function() {
+      return self.botuser.del(plat, userId);
     });
   }
 };

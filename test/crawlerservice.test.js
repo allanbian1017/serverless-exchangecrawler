@@ -3,6 +3,7 @@ const CurrencyCache = require('../lib/currencycache');
 const CurrencyHistory = require('../lib/currencyhistory');
 const LineBot = require('../lib/linebot');
 const EventDispatcher = require('../lib/eventdispatcher');
+const BotUser = require('../lib/botuser');
 const CrawlerService = require('../src/crawlerservice');
 const should = require('should');
 const sinon = require('sinon');
@@ -13,6 +14,7 @@ describe('CrawlerService', function() {
   let bot;
   let history;
   let eventdispatcher;
+  let botuser;
   let service;
 
   before(function() {
@@ -21,12 +23,14 @@ describe('CrawlerService', function() {
     bot = new LineBot({lineclient: '', botuser: ''});
     history = new CurrencyHistory({storage: ''});
     eventdispatcher = new EventDispatcher({sns: '', arns: ''});
+    botuser = new BotUser({storage: ''});
     service = new CrawlerService({
       bot: bot,
       cache: cache,
       src: src,
       history: history,
       eventdispatcher: eventdispatcher,
+      botuser: botuser,
     });
   });
 
@@ -217,6 +221,64 @@ describe('CrawlerService', function() {
 
       return service.fetchHistory(testDate).then(function(data) {
         data.should.be.exactly(expectData);
+        return Promise.resolve();
+      });
+    });
+  });
+
+  describe('#addSubscribeUser()', function() {
+    let sandbox;
+
+    beforeEach(function() {
+      sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
+    });
+
+    it('should execute success without error', function() {
+      const testPlat = 'line';
+      const testUserId = '1234';
+
+      sandbox
+        .stub(botuser, 'add')
+        .withArgs(testPlat, testUserId)
+        .resolves()
+        .withArgs()
+        .rejects();
+
+      return service.addSubscribeUser(testPlat, testUserId).then(function() {
+        sandbox.verify();
+        return Promise.resolve();
+      });
+    });
+  });
+
+  describe('#delSubscribeUser()', function() {
+    let sandbox;
+
+    beforeEach(function() {
+      sandbox = sinon.sandbox.create();
+    });
+
+    afterEach(function() {
+      sandbox.restore();
+    });
+
+    it('should execute success without error', function() {
+      const testPlat = 'line';
+      const testUserId = '1234';
+
+      sandbox
+        .stub(botuser, 'del')
+        .withArgs(testPlat, testUserId)
+        .resolves()
+        .withArgs()
+        .rejects();
+
+      return service.delSubscribeUser(testPlat, testUserId).then(function() {
+        sandbox.verify();
         return Promise.resolve();
       });
     });

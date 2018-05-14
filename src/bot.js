@@ -4,11 +4,15 @@ const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const CurrencyCache = require('../lib/currencycache');
 const CrawlerService = require('./crawlerservice');
+const BotUser = require('../lib/botuser');
 
+const s3 = new AWS.S3();
+const botuser = new BotUser({storage: s3});
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const cache = new CurrencyCache({db: dynamodb});
 const service = new CrawlerService({
   cache: cache,
+  botuser: botuser,
 });
 
 exports.main = (event, context, cb) => {
@@ -48,6 +52,14 @@ exports.main = (event, context, cb) => {
           'GBP',
           'HKD',
         ]);
+      } else if (body.result.action === 'subscription.subscribe') {
+        let plat = body.originalRequest.source;
+        let userId = body.originalRequest.data.source.userId;
+        return service.addSubscribeUser(plat, userId);
+      } else if (body.result.action === 'subscription.subscribe') {
+        let plat = body.originalRequest.source;
+        let userId = body.originalRequest.data.source.userId;
+        return service.delSubscribeUser(plat, userId);
       } else {
         return Promise.resolve({text: '我不懂'});
       }
