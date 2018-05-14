@@ -240,6 +240,7 @@ describe('CrawlerService', function() {
     it('should execute success without error', function() {
       const testPlat = 'line';
       const testUserId = '1234';
+      const expectMsg = '訂閱成功';
 
       sandbox
         .stub(botuser, 'add')
@@ -248,10 +249,12 @@ describe('CrawlerService', function() {
         .withArgs()
         .rejects();
 
-      return service.addSubscribeUser(testPlat, testUserId).then(function() {
-        sandbox.verify();
-        return Promise.resolve();
-      });
+      return service
+        .addSubscribeUser(testPlat, testUserId)
+        .then(function(data) {
+          data.text.should.be.exactly(expectMsg);
+          return Promise.resolve();
+        });
     });
   });
 
@@ -269,6 +272,7 @@ describe('CrawlerService', function() {
     it('should execute success without error', function() {
       const testPlat = 'line';
       const testUserId = '1234';
+      const expectMsg = '取消訂閱成功';
 
       sandbox
         .stub(botuser, 'del')
@@ -277,10 +281,12 @@ describe('CrawlerService', function() {
         .withArgs()
         .rejects();
 
-      return service.delSubscribeUser(testPlat, testUserId).then(function() {
-        sandbox.verify();
-        return Promise.resolve();
-      });
+      return service
+        .delSubscribeUser(testPlat, testUserId)
+        .then(function(data) {
+          data.text.should.be.exactly(expectMsg);
+          return Promise.resolve();
+        });
     });
   });
 });

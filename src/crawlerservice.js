@@ -170,9 +170,13 @@ const CrawlerService = class {
   addSubscribeUser(plat, userId) {
     let self = this;
 
-    return Promise.resolve().then(function() {
-      return self.botuser.add(plat, userId);
-    });
+    return Promise.resolve()
+      .then(function() {
+        return self.botuser.add(plat, userId);
+      })
+      .then(function() {
+        return Promise.resolve({text: '訂閱成功'});
+      });
   }
 
   /**
@@ -185,9 +189,13 @@ const CrawlerService = class {
   delSubscribeUser(plat, userId) {
     let self = this;
 
-    return Promise.resolve().then(function() {
-      return self.botuser.del(plat, userId);
-    });
+    return Promise.resolve()
+      .then(function() {
+        return self.botuser.del(plat, userId);
+      })
+      .then(function() {
+        return Promise.resolve({text: '取消訂閱成功'});
+      });
   }
 };
 
