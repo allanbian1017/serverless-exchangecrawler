@@ -56,7 +56,7 @@ exports.main = (event, context, cb) => {
         let plat = body.originalRequest.source;
         let userId = body.originalRequest.data.source.userId;
         return service.addSubscribeUser(plat, userId);
-      } else if (body.result.action === 'subscription.subscribe') {
+      } else if (body.result.action === 'subscription.unsubscribe') {
         let plat = body.originalRequest.source;
         let userId = body.originalRequest.data.source.userId;
         return service.delSubscribeUser(plat, userId);
