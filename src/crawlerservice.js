@@ -61,7 +61,9 @@ const CrawlerService = class {
    */
   queryCurrency(types) {
     let self = this;
-    self.metrics.count('service.queryCurrency', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'queryCurrency',
+    });
 
     return Promise.resolve()
       .then(function() {
@@ -89,7 +91,9 @@ const CrawlerService = class {
    */
   publishEvents(events) {
     let self = this;
-    self.metrics.count('service.publishEvents', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'publishEvents',
+    });
 
     return Promise.resolve().then(function() {
       return Promise.all(
@@ -108,7 +112,9 @@ const CrawlerService = class {
    */
   crawlingCurrency(types) {
     let self = this;
-    self.metrics.count('service.crawlingCurrency', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'crawlingCurrency',
+    });
 
     return Promise.resolve()
       .then(function() {
@@ -159,7 +165,9 @@ const CrawlerService = class {
    */
   fetchHistory(date) {
     let self = this;
-    self.metrics.count('service.fetchHistory', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'fetchHistory',
+    });
 
     return Promise.resolve().then(function() {
       return self.history.get('BOT', date);
@@ -175,7 +183,9 @@ const CrawlerService = class {
    */
   addSubscribeUser(plat, userId) {
     let self = this;
-    self.metrics.count('service.addSubscribeUser', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'addSubscribeUser',
+    });
 
     return Promise.resolve()
       .then(function() {
@@ -195,7 +205,9 @@ const CrawlerService = class {
    */
   delSubscribeUser(plat, userId) {
     let self = this;
-    self.metrics.count('service.delSubscribeUser', 1);
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'delSubscribeUser',
+    });
 
     return Promise.resolve()
       .then(function() {
