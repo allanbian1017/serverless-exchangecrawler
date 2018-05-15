@@ -67,7 +67,7 @@ describe('CrawlerService', function() {
       const testEvents = [
         {
           Message: JSON.stringify({
-            date: '2017-09-20T14:04:00+00:00',
+            date: 1505916240000,
             USD: 30,
             JPY: 0.27,
             AUD: 22,
@@ -146,7 +146,7 @@ describe('CrawlerService', function() {
       const testHist = {
         bank: 'BOT',
         data: {
-          date: '2017-09-19T14:04:00+00:00',
+          date: 1505829840000,
           USD: 30,
           JPY: 0.27,
           AUD: 22,
@@ -155,7 +155,7 @@ describe('CrawlerService', function() {
       };
 
       const testCur = {
-        date: '2017-09-20T14:04:00+00:00',
+        date: 1505916240000,
         USD: 30,
         JPY: 0.27,
         AUD: 22,
