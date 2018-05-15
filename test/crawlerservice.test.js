@@ -7,6 +7,7 @@ const BotUser = require('../lib/botuser');
 const CrawlerService = require('../src/crawlerservice');
 const should = require('should');
 const sinon = require('sinon');
+let metrics = require('serverless-datadog-metrics');
 
 describe('CrawlerService', function() {
   let src;
@@ -16,6 +17,7 @@ describe('CrawlerService', function() {
   let eventdispatcher;
   let botuser;
   let service;
+  let globalSandbox;
 
   before(function() {
     src = new CurrencySource({client: ''});
@@ -31,7 +33,15 @@ describe('CrawlerService', function() {
       history: history,
       eventdispatcher: eventdispatcher,
       botuser: botuser,
+      metrics: metrics,
     });
+
+    globalSandbox = sinon.sandbox.create();
+    globalSandbox.stub(metrics, 'count').returns();
+  });
+
+  after(function() {
+    globalSandbox.restore();
   });
 
   describe('#publishEvents()', function() {
