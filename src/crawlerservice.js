@@ -13,6 +13,7 @@ const CrawlerService = class {
    * @param {Object} options.history CurrencyHistory object.
    * @param {Object} options.eventdispatcher EventDispatcher object.
    * @param {Object} options.botuser BotUser object.
+   * @param {Object} options.metrics serverless-datadog-metrics object.
    */
   constructor(options) {
     this.src = options.src;
@@ -21,6 +22,7 @@ const CrawlerService = class {
     this.history = options.history;
     this.eventdispatcher = options.eventdispatcher;
     this.botuser = options.botuser;
+    this.metrics = options.metrics;
   }
 
   /**
@@ -59,6 +61,7 @@ const CrawlerService = class {
    */
   queryCurrency(types) {
     let self = this;
+    self.metrics.count('service.queryCurrency', 1);
 
     return Promise.resolve()
       .then(function() {
@@ -86,6 +89,7 @@ const CrawlerService = class {
    */
   publishEvents(events) {
     let self = this;
+    self.metrics.count('service.publishEvents', 1);
 
     return Promise.resolve().then(function() {
       return Promise.all(
@@ -104,6 +108,7 @@ const CrawlerService = class {
    */
   crawlingCurrency(types) {
     let self = this;
+    self.metrics.count('service.crawlingCurrency', 1);
 
     return Promise.resolve()
       .then(function() {
@@ -154,6 +159,7 @@ const CrawlerService = class {
    */
   fetchHistory(date) {
     let self = this;
+    self.metrics.count('service.fetchHistory', 1);
 
     return Promise.resolve().then(function() {
       return self.history.get('BOT', date);
@@ -169,6 +175,7 @@ const CrawlerService = class {
    */
   addSubscribeUser(plat, userId) {
     let self = this;
+    self.metrics.count('service.addSubscribeUser', 1);
 
     return Promise.resolve()
       .then(function() {
@@ -188,6 +195,7 @@ const CrawlerService = class {
    */
   delSubscribeUser(plat, userId) {
     let self = this;
+    self.metrics.count('service.delSubscribeUser', 1);
 
     return Promise.resolve()
       .then(function() {

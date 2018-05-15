@@ -2,6 +2,7 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
+const metrics = require('serverless-datadog-metrics');
 const HttpClient = require('../lib/httpclient');
 const CurrencySource = require('../lib/currencysource');
 const CurrencyCache = require('../lib/currencycache');
@@ -25,6 +26,7 @@ const service = new CrawlerService({
   src: src,
   history: history,
   eventdispatcher: eventdispatcher,
+  metrics: metrics,
 });
 
 exports.main = (event, context, cb) => {
@@ -45,4 +47,3 @@ exports.main = (event, context, cb) => {
       cb(err);
     });
 };
-

@@ -4,8 +4,7 @@
   "description": "exchange rate crawler",
   "main": "index.js",
   "scripts": {
-    "test":
-      "./node_modules/.bin/nyc nyc --reporter=text-summary mocha test/*test.js",
+    "test": "./node_modules/.bin/nyc nyc --reporter=text-summary mocha test/*test.js",
     "lint": "./node_modules/.bin/eslint ."
   },
   "author": "allanbian",
@@ -13,7 +12,8 @@
     "@line/bot-sdk": "^1.0.0",
     "aws-xray-sdk": "^1.1.6",
     "moment": "^2.18.1",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "serverless-datadog-metrics": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "^4.12.0",

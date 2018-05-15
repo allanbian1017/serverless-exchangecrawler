@@ -2,6 +2,7 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
+const metrics = require('serverless-datadog-metrics');
 const CurrencyCache = require('../lib/currencycache');
 const CrawlerService = require('./crawlerservice');
 const BotUser = require('../lib/botuser');
@@ -13,6 +14,7 @@ const cache = new CurrencyCache({db: dynamodb});
 const service = new CrawlerService({
   cache: cache,
   botuser: botuser,
+  metrics: metrics,
 });
 
 exports.main = (event, context, cb) => {
