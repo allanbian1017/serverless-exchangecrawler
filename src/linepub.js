@@ -17,9 +17,11 @@ const client = new line.Client({
 const bot = new LineBot({
   lineclient: client,
   botuser: botuser,
+});
+const service = new CrawlerService({
+  bot: bot,
   metrics: metrics,
 });
-const service = new CrawlerService({bot: bot});
 
 exports.main = (event, context, cb) => {
   console.log(event);
