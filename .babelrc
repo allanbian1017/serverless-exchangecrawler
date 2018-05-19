@@ -1,0 +1,5 @@
+{
+  "comments": false,
+  "presets": [["env", {"node": "6.10"}]],
+  "plugins": ["source-map-support"]
+}
