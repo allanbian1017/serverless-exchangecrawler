@@ -5,7 +5,7 @@ const LineBot = require('../lib/linebot');
 const EventDispatcher = require('../lib/eventdispatcher');
 const BotUser = require('../lib/botuser');
 const CrawlerService = require('../src/crawlerservice');
-const should = require('should');
+const expect = require('chai').expect;
 const sinon = require('sinon');
 let metrics = require('serverless-datadog-metrics');
 
@@ -123,7 +123,7 @@ describe('CrawlerService', function() {
         .rejects();
 
       return service.queryCurrency(testTypes).then(function(data) {
-        data.text.should.be.exactly(expectMsg);
+        expect(data.text).to.equal(expectMsg);
         return Promise.resolve();
       });
     });
@@ -230,7 +230,7 @@ describe('CrawlerService', function() {
         .rejects();
 
       return service.fetchHistory(testDate).then(function(data) {
-        data.should.be.exactly(expectData);
+        expect(data).to.equal(expectData);
         return Promise.resolve();
       });
     });
@@ -262,7 +262,7 @@ describe('CrawlerService', function() {
       return service
         .addSubscribeUser(testPlat, testUserId)
         .then(function(data) {
-          data.text.should.be.exactly(expectMsg);
+          expect(data.text).to.equal(expectMsg);
           return Promise.resolve();
         });
     });
@@ -294,7 +294,7 @@ describe('CrawlerService', function() {
       return service
         .delSubscribeUser(testPlat, testUserId)
         .then(function(data) {
-          data.text.should.be.exactly(expectMsg);
+          expect(data.text).to.equal(expectMsg);
           return Promise.resolve();
         });
     });
