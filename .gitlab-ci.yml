@@ -32,5 +32,7 @@ deploy_production:
   script:
     - npm install -g serverless
     - sls deploy
+  environment:
+    name: prod
   only:
     - master
