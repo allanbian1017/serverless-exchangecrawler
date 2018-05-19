@@ -48,9 +48,11 @@ plugins:
   - serverless-webpack
 
 custom:
-  webpackIncludeModules: 
-    forceExclude:
-      - aws-sdk
+  webpack:
+    webpackConfig: 'webpack.config.js'
+    includeModules:
+      forceExclude:
+        - aws-sdk
 
 resources:
   Resources:
