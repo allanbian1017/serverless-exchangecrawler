@@ -45,7 +45,10 @@ package:
 
 plugins:
   - serverless-plugin-tracing
-  - serverless-plugin-browserifier
+  - serverless-webpack
+
+custom:
+  webpackIncludeModules: true
 
 resources:
   Resources:
