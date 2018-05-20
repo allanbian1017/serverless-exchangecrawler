@@ -4,10 +4,10 @@ const CurrencyHistory = require('../lib/currencyhistory');
 const LineBot = require('../lib/linebot');
 const EventDispatcher = require('../lib/eventdispatcher');
 const BotUser = require('../lib/botuser');
+const Metrics = require('../lib/metrics');
 const CrawlerService = require('../src/crawlerservice');
 const expect = require('chai').expect;
 const sinon = require('sinon');
-let metrics = require('serverless-datadog-metrics');
 
 describe('CrawlerService', function() {
   let src;
@@ -18,6 +18,7 @@ describe('CrawlerService', function() {
   let botuser;
   let service;
   let globalSandbox;
+  let metrics;
 
   before(function() {
     src = new CurrencySource({client: ''});
@@ -26,6 +27,7 @@ describe('CrawlerService', function() {
     history = new CurrencyHistory({storage: ''});
     eventdispatcher = new EventDispatcher({sns: '', arns: ''});
     botuser = new BotUser({storage: ''});
+    metrics = new Metrics('');
     service = new CrawlerService({
       bot: bot,
       cache: cache,
@@ -37,7 +39,7 @@ describe('CrawlerService', function() {
     });
 
     globalSandbox = sinon.sandbox.create();
-    globalSandbox.stub(metrics, 'count').returns();
+    globalSandbox.stub(metrics, 'count').resolves();
   });
 
   after(function() {

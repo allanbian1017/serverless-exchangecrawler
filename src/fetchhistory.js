@@ -3,12 +3,13 @@
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const moment = require('moment');
-const metrics = require('serverless-datadog-metrics');
+const Metrics = require('../lib/metrics');
 const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('./crawlerservice');
 
 const s3 = new AWS.S3();
 const history = new CurrencyHistory({storage: s3});
+const metrics = new Metrics(process.env.DATADOG_API_KEY);
 const service = new CrawlerService({
   history: history,
   metrics: metrics,

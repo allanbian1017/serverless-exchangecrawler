@@ -39,6 +39,7 @@ provider:
           - Ref: AWS::Region
           - Ref: AWS::AccountId
           - currencychanged
+    DATADOG_API_KEY: ${ssm:/exchangecrawler/DATADOG_API_KEY}
 
 package:
   individually: true

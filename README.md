@@ -28,6 +28,12 @@ aws ssm put-parameter --type=String --name /exchangecrawler/LINE_ACCESSTOKEN --v
 aws ssm put-parameter --type=String --name /exchangecrawler/LINE_SECRET --value **YOUR SECRET**
 ```
 
+Setup Datadog api key:
+
+```bash
+aws ssm put-parameter --type=String --name /exchangecrawler/DATADOG_API_KEY --value **YOUR API KEY**
+```
+
 Deploy ExchangeCrawler service to AWS:
 
 ```bash

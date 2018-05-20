@@ -2,7 +2,7 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
-const metrics = require('serverless-datadog-metrics');
+const Metrics = require('../lib/metrics');
 const LineBot = require('../lib/linebot');
 const BotUser = require('../lib/botuser');
 const CrawlerService = require('./crawlerservice');
@@ -18,6 +18,7 @@ const bot = new LineBot({
   lineclient: client,
   botuser: botuser,
 });
+const metrics = new Metrics(process.env.DATADOG_API_KEY);
 const service = new CrawlerService({
   bot: bot,
   metrics: metrics,
