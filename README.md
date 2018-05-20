@@ -34,6 +34,12 @@ Setup Datadog api key:
 aws ssm put-parameter --type=String --name /exchangecrawler/DATADOG_API_KEY --value **YOUR API KEY**
 ```
 
+Setup Logz.io token:
+
+```bash
+aws ssm put-parameter --type=String --name /exchangecrawler/LOGZIO_TOKEN --value **YOUR TOKEN**
+```
+
 Deploy ExchangeCrawler service to AWS:
 
 ```bash

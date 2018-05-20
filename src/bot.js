@@ -3,13 +3,17 @@
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
+const LogzIO = require('winston-logzio');
 const Metrics = require('../lib/metrics');
 const CurrencyCache = require('../lib/currencycache');
 const CrawlerService = require('./crawlerservice');
 const BotUser = require('../lib/botuser');
 
-const logger = winston.createLogger({
-  transports: [new winston.transports.Console()],
+const logZIOTransport = new LogzIO({
+  token: process.env.LOGZIO_TOKEN,
+});
+const logger = new winston.Logger({
+  transports: [new winston.transports.Console(), logZIOTransport],
 });
 const s3 = new AWS.S3();
 const botuser = new BotUser({storage: s3});
@@ -79,11 +83,12 @@ exports.main = (event, context, cb) => {
       });
 
       logger.log('info', 'api response', response);
+      logZIOTransport.flush();
       cb(null, response);
     })
     .catch(function(err) {
       logger.log('error', 'api error', err);
-
+      logZIOTransport.flush();
       cb(err);
     });
 };

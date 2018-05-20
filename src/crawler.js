@@ -3,6 +3,7 @@
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
+const LogzIO = require('winston-logzio');
 const Metrics = require('../lib/metrics');
 const HttpClient = require('../lib/httpclient');
 const CurrencySource = require('../lib/currencysource');
@@ -11,8 +12,11 @@ const CurrencyHistory = require('../lib/currencyhistory');
 const EventDispatcher = require('../lib/eventdispatcher');
 const CrawlerService = require('./crawlerservice');
 
-const logger = winston.createLogger({
-  transports: [new winston.transports.Console()],
+const logZIOTransport = new LogzIO({
+  token: process.env.LOGZIO_TOKEN,
+});
+const logger = new winston.Logger({
+  transports: [new winston.transports.Console(), logZIOTransport],
 });
 const sns = new AWS.SNS();
 const s3 = new AWS.S3();
@@ -44,11 +48,12 @@ exports.main = (event, context, cb) => {
       return service.crawlingCurrency(types);
     })
     .then(function() {
+      logZIOTransport.flush();
       cb();
     })
     .catch(function(err) {
       logger.log('error', 'api error', err);
-
+      logZIOTransport.flush();
       cb(err);
     });
 };
