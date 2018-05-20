@@ -3,10 +3,14 @@
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const moment = require('moment');
+const winston = require('winston');
 const Metrics = require('../lib/metrics');
 const CurrencyHistory = require('../lib/currencyhistory');
 const CrawlerService = require('./crawlerservice');
 
+const logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+});
 const s3 = new AWS.S3();
 const history = new CurrencyHistory({storage: s3});
 const metrics = new Metrics(process.env.DATADOG_API_KEY);
@@ -16,7 +20,7 @@ const service = new CrawlerService({
 });
 
 exports.main = (event, context, cb) => {
-  console.log(event);
+  logger.log('info', 'api request', event);
 
   let response = {
     statusCode: 200,
@@ -37,10 +41,11 @@ exports.main = (event, context, cb) => {
       }
 
       response.body = JSON.stringify({History: data});
+      logger.log('info', 'api response', response);
       cb(null, response);
     })
     .catch(function(err) {
-      console.log(err);
+      logger.log('error', 'api error', err);
 
       cb(err);
     });

@@ -2,12 +2,16 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
+const winston = require('winston');
 const Metrics = require('../lib/metrics');
 const LineBot = require('../lib/linebot');
 const BotUser = require('../lib/botuser');
 const CrawlerService = require('./crawlerservice');
 const line = require('@line/bot-sdk');
 
+const logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+});
 const s3 = new AWS.S3();
 const botuser = new BotUser({storage: s3});
 const client = new line.Client({
@@ -25,7 +29,7 @@ const service = new CrawlerService({
 });
 
 exports.main = (event, context, cb) => {
-  console.log(event);
+  logger.log('info', 'api request', event);
 
   Promise.resolve()
     .then(function() {
@@ -39,7 +43,7 @@ exports.main = (event, context, cb) => {
       cb();
     })
     .catch(function(err) {
-      console.log(err);
+      logger.log('error', 'api error', err);
 
       cb(err);
     });

@@ -2,11 +2,15 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
+const winston = require('winston');
 const Metrics = require('../lib/metrics');
 const CurrencyCache = require('../lib/currencycache');
 const CrawlerService = require('./crawlerservice');
 const BotUser = require('../lib/botuser');
 
+const logger = winston.createLogger({
+  transports: [new winston.transports.Console()],
+});
 const s3 = new AWS.S3();
 const botuser = new BotUser({storage: s3});
 const dynamodb = new AWS.DynamoDB.DocumentClient();
@@ -19,7 +23,7 @@ const service = new CrawlerService({
 });
 
 exports.main = (event, context, cb) => {
-  console.log(event);
+  logger.log('info', 'api request', event);
 
   const body = JSON.parse(event.body);
   let response = {};
@@ -73,10 +77,12 @@ exports.main = (event, context, cb) => {
         speech: data.text,
         displayText: data.text,
       });
+
+      logger.log('info', 'api response', response);
       cb(null, response);
     })
     .catch(function(err) {
-      console.log(err);
+      logger.log('error', 'api error', err);
 
       cb(err);
     });
