@@ -27,7 +27,7 @@ describe('CrawlerService', function() {
     history = new CurrencyHistory({storage: ''});
     eventdispatcher = new EventDispatcher({sns: '', arns: ''});
     botuser = new BotUser({storage: ''});
-    metrics = new Metrics('');
+    metrics = new Metrics('123');
     service = new CrawlerService({
       bot: bot,
       cache: cache,
