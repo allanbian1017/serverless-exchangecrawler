@@ -33,7 +33,7 @@ const service = new CrawlerService({
 });
 
 exports.main = (event, context, cb) => {
-  logger.log('info', 'api request', event);
+  logger.log('info', 'pub start', event);
 
   Promise.resolve()
     .then(function() {
@@ -48,7 +48,7 @@ exports.main = (event, context, cb) => {
       cb();
     })
     .catch(function(err) {
-      logger.log('error', 'api error', err);
+      logger.log('error', 'pub error', err);
       logZIOTransport.flush();
       cb(err);
     });

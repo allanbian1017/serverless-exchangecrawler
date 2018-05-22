@@ -39,7 +39,7 @@ const service = new CrawlerService({
 });
 
 exports.main = (event, context, cb) => {
-  logger.log('info', 'api request', event);
+  logger.log('info', 'crawler start', event);
 
   let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
 
@@ -52,7 +52,7 @@ exports.main = (event, context, cb) => {
       cb();
     })
     .catch(function(err) {
-      logger.log('error', 'api error', err);
+      logger.log('error', 'crawler error', err);
       logZIOTransport.flush();
       cb(err);
     });
