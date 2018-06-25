@@ -1,6 +1,7 @@
 'use strict';
 
 const moment = require('moment');
+const Metrics = require('../lib/metrics');
 
 const CrawlerService = class {
   /**
@@ -22,7 +23,7 @@ const CrawlerService = class {
     this.history = options.history;
     this.eventdispatcher = options.eventdispatcher;
     this.botuser = options.botuser;
-    this.metrics = options.metrics;
+    this.metrics = new Metrics();
   }
 
   /**

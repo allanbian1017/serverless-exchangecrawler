@@ -4,7 +4,6 @@ const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
 const LogzIO = require('winston-logzio');
-const Metrics = require('../lib/metrics');
 const HttpClient = require('../lib/httpclient');
 const CurrencySource = require('../lib/currencysource');
 const CurrencyCache = require('../lib/currencycache');
@@ -29,13 +28,11 @@ const eventdispatcher = new EventDispatcher({
   sns: sns,
   arns: {currencychanged: process.env.CURRENCY_CHANGED_SNS_ARN},
 });
-const metrics = new Metrics(process.env.DATADOG_API_KEY);
 const service = new CrawlerService({
   cache: cache,
   src: src,
   history: history,
   eventdispatcher: eventdispatcher,
-  metrics: metrics,
 });
 
 exports.main = (event, context, cb) => {

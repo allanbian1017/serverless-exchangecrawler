@@ -4,7 +4,6 @@ const CurrencyHistory = require('../lib/currencyhistory');
 const LineBot = require('../lib/linebot');
 const EventDispatcher = require('../lib/eventdispatcher');
 const BotUser = require('../lib/botuser');
-const Metrics = require('../lib/metrics');
 const CrawlerService = require('../src/crawlerservice');
 const expect = require('chai').expect;
 const sinon = require('sinon');
@@ -17,17 +16,15 @@ describe('CrawlerService', function() {
   let eventdispatcher;
   let botuser;
   let service;
-  let globalSandbox;
-  let metrics;
 
   before(function() {
+    process.env.DATADOG_API_KEY = 'justfortest';
     src = new CurrencySource({client: ''});
     cache = new CurrencyCache({db: ''});
     bot = new LineBot({lineclient: '', botuser: ''});
     history = new CurrencyHistory({storage: ''});
     eventdispatcher = new EventDispatcher({sns: '', arns: ''});
     botuser = new BotUser({storage: ''});
-    metrics = new Metrics('123');
     service = new CrawlerService({
       bot: bot,
       cache: cache,
@@ -35,15 +32,7 @@ describe('CrawlerService', function() {
       history: history,
       eventdispatcher: eventdispatcher,
       botuser: botuser,
-      metrics: metrics,
     });
-
-    globalSandbox = sinon.sandbox.create();
-    globalSandbox.stub(metrics, 'count').resolves();
-  });
-
-  after(function() {
-    globalSandbox.restore();
   });
 
   describe('#publishEvents()', function() {

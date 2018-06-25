@@ -4,7 +4,6 @@ const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
 const LogzIO = require('winston-logzio');
-const Metrics = require('../lib/metrics');
 const CurrencyCache = require('../lib/currencycache');
 const CrawlerService = require('./crawlerservice');
 const BotUser = require('../lib/botuser');
@@ -19,11 +18,9 @@ const s3 = new AWS.S3();
 const botuser = new BotUser({storage: s3});
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 const cache = new CurrencyCache({db: dynamodb});
-const metrics = new Metrics(process.env.DATADOG_API_KEY);
 const service = new CrawlerService({
   cache: cache,
   botuser: botuser,
-  metrics: metrics,
 });
 
 exports.main = (event, context, cb) => {

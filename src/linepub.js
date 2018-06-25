@@ -4,7 +4,6 @@ const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
 const LogzIO = require('winston-logzio');
-const Metrics = require('../lib/metrics');
 const LineBot = require('../lib/linebot');
 const BotUser = require('../lib/botuser');
 const CrawlerService = require('./crawlerservice');
@@ -26,10 +25,8 @@ const bot = new LineBot({
   lineclient: client,
   botuser: botuser,
 });
-const metrics = new Metrics(process.env.DATADOG_API_KEY);
 const service = new CrawlerService({
   bot: bot,
-  metrics: metrics,
 });
 
 exports.main = (event, context, cb) => {
