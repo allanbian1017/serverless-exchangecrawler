@@ -172,6 +172,32 @@ const CrawlerService = class {
   }
 
   /**
+   * Fetch Currency History.
+   *
+   * @param {String} date History date.
+   * @param {String} country fetch's country.
+   * @return {Promise}
+   */
+  fetchHistoryByCurrency(date, country) {
+    let self = this;
+    self.metrics.count('exchange-crawler.service', 1, {
+      func: 'fetchHistory',
+    });
+
+    return Promise.resolve()
+      .then(function() {
+        return self.history.get('BOT', date);
+      })
+      .then(function(allCurrency) {
+        countryCurrency = {
+          Rate: allCurrency[country],
+          Date: allCurrency[date],
+        };
+        return Promise.resolve(countryCurrency);
+      });
+  }
+
+  /**
    * Add subscribe user.
    *
    * @param {String} plat Bot platform.
