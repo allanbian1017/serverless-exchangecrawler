@@ -29,6 +29,7 @@
     "eslint-config-google": "^0.9.1",
     "mocha": "^3.4.1",
     "nyc": "^11.3.0",
+    "prettier": "^1.16.4",
     "serverless-plugin-tracing": "^2.0.0",
     "serverless-webpack": "^5.1.5",
     "sinon": "^2.2.0",
