@@ -41,14 +41,14 @@ exports.main = (event, context, cb) => {
   let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
 
   Promise.resolve()
-    .then(function() {
+    .then(() => {
       return service.crawlingCurrency(types);
     })
-    .then(function() {
+    .then(() => {
       logZIOTransport.flush();
       cb();
     })
-    .catch(function(err) {
+    .catch((err) => {
       logger.log('error', 'crawler error', err);
       logZIOTransport.flush();
       cb(err);

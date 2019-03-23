@@ -38,7 +38,7 @@ exports.main = (event, context, cb) => {
   }
 
   Promise.resolve()
-    .then(function() {
+    .then(() => {
       if (body.result.action === 'query.currency') {
         if (!body.result.parameters || !body.result.parameters.CurrencyType) {
           response.statusCode = 400;
@@ -72,7 +72,7 @@ exports.main = (event, context, cb) => {
         return Promise.resolve({text: '我不懂'});
       }
     })
-    .then(function(data) {
+    .then((data) => {
       response.statusCode = 200;
       response.body = JSON.stringify({
         speech: data.text,
@@ -83,7 +83,7 @@ exports.main = (event, context, cb) => {
       logZIOTransport.flush();
       cb(null, response);
     })
-    .catch(function(err) {
+    .catch((err) => {
       logger.log('error', 'api error', err);
       logZIOTransport.flush();
       cb(err);

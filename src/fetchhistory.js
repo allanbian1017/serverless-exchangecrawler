@@ -31,10 +31,10 @@ exports.main = (event, context, cb) => {
   };
 
   Promise.resolve()
-    .then(function() {
+    .then(() => {
       return service.fetchHistory(event.pathParameters.date);
     })
-    .then(function(data) {
+    .then((data) => {
       if (moment().format('YYYYMMDD') !== event.pathParameters.date) {
         response.headers['cache-control'] = 'public, max-age=31536000';
       } else {
@@ -46,7 +46,7 @@ exports.main = (event, context, cb) => {
       logZIOTransport.flush();
       cb(null, response);
     })
-    .catch(function(err) {
+    .catch((err) => {
       logger.log('error', 'api error', err);
       logZIOTransport.flush();
       cb(err);

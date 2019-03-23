@@ -56,28 +56,26 @@ const CrawlerService = class {
    * @param {Array} types Currency types.
    * @return {Promise}
    */
-  queryCurrency(types) {
+  async queryCurrency(types) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'queryCurrency',
     });
 
-    return Promise.resolve()
-      .then(function() {
-        return self.cache.get('BOT');
-      })
-      .then(function(data) {
-        if (!Object.keys(data).length) {
-          return Promise.resolve({text: '您好\n'});
-        } else {
-          let result = {};
-          result.date = data.data.date;
-          types.forEach(function(x) {
-            result[x] = data.data[x];
-          });
-          return Promise.resolve({text: self.getCurrencyMsg(result)});
-        }
+    let record = await self.cache.get('BOT');
+    if (!Object.keys(record).length) {
+      return {text: '您好\n'};
+    } else {
+      let data = record.data;
+      let currency = {};
+      currency.date = data.date;
+      types.forEach((x) => {
+        currency[x] = data[x];
       });
+
+      let msg = self.getCurrencyMsg(currency);
+      return {text: msg};
+    }
   }
 
   /**
@@ -86,19 +84,18 @@ const CrawlerService = class {
    * @param {Object} events Crawler service events.
    * @return {Promise}
    */
-  publishEvents(events) {
+  async publishEvents(events) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'publishEvents',
     });
 
-    return Promise.resolve().then(function() {
-      return Promise.all(
-        events.map(function(x) {
-          return self.bot.publish(self.getCurrencyMsg(JSON.parse(x.Message)));
-        })
-      );
-    });
+    await Promise.all(
+      events.map((x) =>
+        self.bot.publish(self.getCurrencyMsg(JSON.parse(x.Message)))
+      )
+    );
+    return {};
   }
 
   /**
@@ -107,51 +104,34 @@ const CrawlerService = class {
    * @param {Array} types Currency types.
    * @return {Promise}
    */
-  crawlingCurrency(types) {
+  async crawlingCurrency(types) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'crawlingCurrency',
     });
 
-    return Promise.resolve()
-      .then(function() {
-        return self.src.query({types: types});
-      })
-      .then(function(data) {
-        let p = [];
-        p.push(self.cache.get('BOT'));
-        p.push(Promise.resolve(data));
+    let curRec = await self.src.query({types: types});
+    let cacheRec = await self.cache.get('BOT');
 
-        return Promise.all(p);
-      })
-      .then(function(data) {
-        let last = data[0];
-        let cur = data[1];
-        let p = [];
+    if (Object.keys(cacheRec).length) {
+      let cacheData = cacheRec.data;
+      if (new Date(curRec.date) > new Date(cacheData.date)) {
+        let dateStr = moment(curRec.date).format('YYYYMMDD');
+        console.log(dateStr);
+        await self.history.add('BOT', dateStr, curRec);
+        await self.cache.put('BOT', curRec);
+        await self.eventdispatcher.dispatchCurrencyChangedEvent(curRec);
+        return {};
+      }
+    } else {
+      let dateStr = moment(curRec.date).format('YYYYMMDD');
+      await self.history.add('BOT', dateStr, curRec);
+      await self.cache.put('BOT', curRec);
+      await self.eventdispatcher.dispatchCurrencyChangedEvent(curRec);
+      return {};
+    }
 
-        if (Object.keys(last).length) {
-          last = last.data;
-          if (new Date(cur.date) > new Date(last.date)) {
-            p.push(
-              self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur)
-            );
-            p.push(self.cache.put('BOT', cur));
-            p.push(self.eventdispatcher.dispatchCurrencyChangedEvent(cur));
-
-            return Promise.all(p);
-          }
-        } else {
-          p.push(
-            self.history.add('BOT', moment(cur.date).format('YYYYMMDD'), cur)
-          );
-          p.push(self.cache.put('BOT', cur));
-          p.push(self.eventdispatcher.dispatchCurrencyChangedEvent(cur));
-
-          return Promise.all(p);
-        }
-
-        return Promise.resolve();
-      });
+    return {};
   }
 
   /**
@@ -160,15 +140,14 @@ const CrawlerService = class {
    * @param {Object} date History date.
    * @return {Promise}
    */
-  fetchHistory(date) {
+  async fetchHistory(date) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'fetchHistory',
     });
 
-    return Promise.resolve().then(function() {
-      return self.history.get('BOT', date);
-    });
+    let records = await self.history.get('BOT', date);
+    return records;
   }
 
   /**
@@ -178,19 +157,14 @@ const CrawlerService = class {
    * @param {String} userId User ID.
    * @return {Promise}
    */
-  addSubscribeUser(plat, userId) {
+  async addSubscribeUser(plat, userId) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'addSubscribeUser',
     });
 
-    return Promise.resolve()
-      .then(function() {
-        return self.botuser.add(plat, userId);
-      })
-      .then(function() {
-        return Promise.resolve({text: '訂閱成功'});
-      });
+    await self.botuser.add(plat, userId);
+    return {text: '訂閱成功'};
   }
 
   /**
@@ -200,19 +174,14 @@ const CrawlerService = class {
    * @param {String} userId User ID.
    * @return {Promise}
    */
-  delSubscribeUser(plat, userId) {
+  async delSubscribeUser(plat, userId) {
     let self = this;
     self.metrics.count('exchange-crawler.service', 1, {
       func: 'delSubscribeUser',
     });
 
-    return Promise.resolve()
-      .then(function() {
-        return self.botuser.del(plat, userId);
-      })
-      .then(function() {
-        return Promise.resolve({text: '取消訂閱成功'});
-      });
+    await self.botuser.del(plat, userId);
+    return {text: '取消訂閱成功'};
   }
 };
 

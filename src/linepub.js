@@ -33,18 +33,18 @@ exports.main = (event, context, cb) => {
   logger.log('info', 'pub start', event);
 
   Promise.resolve()
-    .then(function() {
-      let events = event.Records.map(function(x) {
+    .then(() => {
+      let events = event.Records.map((x) => {
         return x.Sns;
       });
 
       return service.publishEvents(events);
     })
-    .then(function() {
+    .then(() => {
       logZIOTransport.flush();
       cb();
     })
-    .catch(function(err) {
+    .catch((err) => {
       logger.log('error', 'pub error', err);
       logZIOTransport.flush();
       cb(err);
