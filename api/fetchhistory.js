@@ -1,12 +1,10 @@
 'use strict';
 
-const awsXRay = require('aws-xray-sdk');
-const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const moment = require('moment');
 const winston = require('winston');
 const LogzIO = require('winston-logzio');
-const CurrencyHistory = require('../lib/currencyhistory');
-const CrawlerService = require('./crawlerservice');
+const Storage = require('../base/storage');
+const Currency = require('../store/currency');
 
 const logZIOTransport = new LogzIO({
   token: process.env.LOGZIO_TOKEN,
@@ -14,10 +12,9 @@ const logZIOTransport = new LogzIO({
 const logger = new winston.Logger({
   transports: [new winston.transports.Console(), logZIOTransport],
 });
-const s3 = new AWS.S3();
-const history = new CurrencyHistory({storage: s3});
-const service = new CrawlerService({
-  history: history,
+const storage = new Storage();
+const store = new Currency({
+  storage: storage,
 });
 
 exports.main = (event, context, cb) => {
@@ -32,7 +29,9 @@ exports.main = (event, context, cb) => {
 
   Promise.resolve()
     .then(() => {
-      return service.fetchHistory(event.pathParameters.date);
+      let bank = 'BOT';
+      let date = event.pathParameters.date;
+      return store.getHistory(bank, date);
     })
     .then((data) => {
       if (moment().format('YYYYMMDD') !== event.pathParameters.date) {

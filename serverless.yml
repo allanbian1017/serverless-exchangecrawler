@@ -78,26 +78,26 @@ resources:
 
 functions:
   Crawler:
-    handler: src/crawler.main
+    handler: api/crawler.main
     events:
       - schedule:
           rate: rate(1 hour)
   FetchHistory:
-    handler: src/fetchhistory.main
+    handler: api/fetchhistory.main
     events:
       - http:
           path: history/{date}
           method: get
           cors: true
   LinePub:
-    handler: src/linepub.main
+    handler: api/linepub.main
     events:
       - sns: currencychanged
     environment:
       LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
       LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}
   Bot:
-    handler: src/bot.main
+    handler: api/bot.main
     events:
       - http:
           path: bot/

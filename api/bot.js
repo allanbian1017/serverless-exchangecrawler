@@ -1,12 +1,11 @@
 'use strict';
 
-const awsXRay = require('aws-xray-sdk');
-const AWS = awsXRay.captureAWS(require('aws-sdk'));
 const winston = require('winston');
 const LogzIO = require('winston-logzio');
-const CurrencyCache = require('../lib/currencycache');
-const CrawlerService = require('./crawlerservice');
-const BotUser = require('../lib/botuser');
+const KV = require('../base/kv');
+const Storage = require('../base/storage');
+const Currency = require('../store/currency');
+const CrawlerBot = require('../store/crawlerbot');
 
 const logZIOTransport = new LogzIO({
   token: process.env.LOGZIO_TOKEN,
@@ -14,13 +13,15 @@ const logZIOTransport = new LogzIO({
 const logger = new winston.Logger({
   transports: [new winston.transports.Console(), logZIOTransport],
 });
-const s3 = new AWS.S3();
-const botuser = new BotUser({storage: s3});
-const dynamodb = new AWS.DynamoDB.DocumentClient();
-const cache = new CurrencyCache({db: dynamodb});
-const service = new CrawlerService({
-  cache: cache,
-  botuser: botuser,
+const storage = new Storage();
+const kv = new KV();
+const currency = new Currency({
+  storage: storage,
+  kv: kv,
+});
+const store = new CrawlerBot({
+  currency: currency,
+  storage: storage,
 });
 
 exports.main = (event, context, cb) => {
@@ -48,26 +49,19 @@ exports.main = (event, context, cb) => {
           return cb(null, response);
         }
 
-        return service.queryCurrency([body.result.parameters.CurrencyType]);
+        let types = [body.result.parameters.CurrencyType];
+        return store.queryCurrency(types);
       } else if (body.result.action === 'query.currency.all') {
-        return service.queryCurrency([
-          'USD',
-          'JPY',
-          'AUD',
-          'CNY',
-          'KRW',
-          'EUR',
-          'GBP',
-          'HKD',
-        ]);
+        let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
+        return store.queryCurrency(types);
       } else if (body.result.action === 'subscription.subscribe') {
         let plat = body.originalRequest.source;
-        let userId = body.originalRequest.data.source.userId;
-        return service.addSubscribeUser(plat, userId);
+        let userID = body.originalRequest.data.source.userId;
+        return store.addSubscribeUser(plat, userID);
       } else if (body.result.action === 'subscription.unsubscribe') {
         let plat = body.originalRequest.source;
-        let userId = body.originalRequest.data.source.userId;
-        return service.delSubscribeUser(plat, userId);
+        let userID = body.originalRequest.data.source.userId;
+        return store.delSubscribeUser(plat, userID);
       } else {
         return Promise.resolve({text: '我不懂'});
       }
