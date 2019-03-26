@@ -2,6 +2,7 @@
 
 const moment = require('moment');
 const Metrics = require('../base/metrics');
+const NotFoundError = require('../base/error');
 const metrics = new Metrics();
 
 const CrawlerBot = class {
@@ -30,9 +31,17 @@ const CrawlerBot = class {
       func: 'getUsers',
     });
 
-    let path = 'Users/' + plat + '.json';
-    let record = await this.storage.get('currencybucket', path);
-    return record.Users;
+    try {
+      let path = 'Users/' + plat + '.json';
+      let record = await this.storage.get('currencybucket', path);
+      return record.Users;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return {};
+      }
+
+      return err;
+    }
   }
 
   /**

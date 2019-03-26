@@ -2,6 +2,7 @@
 
 const moment = require('moment');
 const Metrics = require('../base/metrics');
+const NotFoundError = require('../base/error');
 const metrics = new Metrics();
 
 const Currency = class {
@@ -183,9 +184,17 @@ const Currency = class {
       func: 'getHistory',
     });
 
-    let path = 'History/' + bank + '/' + date + '.json';
-    let record = await this.storage.get('currencybucket', path);
-    return record.History;
+    try {
+      let path = 'History/' + bank + '/' + date + '.json';
+      let record = await this.storage.get('currencybucket', path);
+      return record.History;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return [];
+      }
+
+      return err;
+    }
   }
 
   /**

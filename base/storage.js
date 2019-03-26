@@ -2,6 +2,7 @@
 
 const awsXRay = require('aws-xray-sdk');
 const AWS = awsXRay.captureAWS(require('aws-sdk'));
+const NotFoundError = require('./error');
 const s3 = new AWS.S3();
 
 const Storage = class {
@@ -32,7 +33,7 @@ const Storage = class {
       return payload;
     } catch (err) {
       if (err.code === 'Forbidden') {
-        return {};
+        return Promise.reject(new NotFoundError('file not found'));
       }
 
       return Promise.reject(err);
