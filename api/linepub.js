@@ -1,17 +1,10 @@
 'use strict';
 
-const winston = require('winston');
-const LogzIO = require('winston-logzio');
+const logger = require('../base/logger');
 const Storage = require('../base/storage');
 const Bot = require('../base/bot');
 const CrawlerBot = require('../store/crawlerbot');
 
-const logZIOTransport = new LogzIO({
-  token: process.env.LOGZIO_TOKEN,
-});
-const logger = new winston.Logger({
-  transports: [new winston.transports.Console(), logZIOTransport],
-});
 const storage = new Storage();
 const bot = new Bot();
 const store = new CrawlerBot({
@@ -34,12 +27,10 @@ exports.main = (event, context, cb) => {
       return Promise.all(p);
     })
     .then(() => {
-      logZIOTransport.flush();
       cb();
     })
     .catch((err) => {
       logger.log('error', 'pub error', err);
-      logZIOTransport.flush();
       cb(err);
     });
 };

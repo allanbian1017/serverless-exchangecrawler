@@ -1,19 +1,12 @@
 'use strict';
 
-const winston = require('winston');
-const LogzIO = require('winston-logzio');
+const logger = require('../base/logger');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
 const Event = require('../base/event');
 const HttpClient = require('../base/httpclient');
 const Currency = require('../store/currency');
 
-const logZIOTransport = new LogzIO({
-  token: process.env.LOGZIO_TOKEN,
-});
-const logger = new winston.Logger({
-  transports: [new winston.transports.Console(), logZIOTransport],
-});
 const event = new Event();
 const httpclient = new HttpClient();
 const kv = new KV();
@@ -35,12 +28,10 @@ exports.main = (event, context, cb) => {
       return store.crawlingCurrency(types);
     })
     .then(() => {
-      logZIOTransport.flush();
       cb();
     })
     .catch((err) => {
       logger.log('error', 'crawler error', err);
-      logZIOTransport.flush();
       cb(err);
     });
 };

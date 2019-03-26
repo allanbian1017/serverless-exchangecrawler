@@ -1,17 +1,10 @@
 'use strict';
 
 const moment = require('moment');
-const winston = require('winston');
-const LogzIO = require('winston-logzio');
+const logger = require('../base/logger');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
 
-const logZIOTransport = new LogzIO({
-  token: process.env.LOGZIO_TOKEN,
-});
-const logger = new winston.Logger({
-  transports: [new winston.transports.Console(), logZIOTransport],
-});
 const storage = new Storage();
 const store = new Currency({
   storage: storage,
@@ -42,12 +35,10 @@ exports.main = (event, context, cb) => {
 
       response.body = JSON.stringify({History: data});
       logger.log('info', 'api response', response);
-      logZIOTransport.flush();
       cb(null, response);
     })
     .catch((err) => {
       logger.log('error', 'api error', err);
-      logZIOTransport.flush();
       cb(err);
     });
 };
