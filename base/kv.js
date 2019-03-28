@@ -18,11 +18,12 @@ const KV = class {
   /**
    * Get from database.
    *
+   * @param {Context} context context.
    * @param {String} table table name.
    * @param {String} key key name.
    * @return {Promise}
    */
-  async get(table, key) {
+  async get(context, table, key) {
     let params = {
       TableName: table,
       Key: {},
@@ -31,6 +32,8 @@ const KV = class {
     // TODO currently we only support partition key only table
     //   we need to support partition key + sort key table
     let keyName = this.tableKeySetting[table];
+    context.logger.log('debug', 'kv.get keyName', {keyName: keyName});
+
     params.Key[keyName] = key;
 
     let record = await dynamodb.get(params).promise();
@@ -44,12 +47,13 @@ const KV = class {
   /**
    * Put to database.
    *
+   * @param {Context} context context.
    * @param {String} table table name.
    * @param {String} key key name.
    * @param {Object} value object to store.
    * @return {Promise}
    */
-  async put(table, key, value) {
+  async put(context, table, key, value) {
     let params = {
       TableName: 'currency',
       Item: value,
@@ -58,6 +62,8 @@ const KV = class {
     // TODO currently we only support partition key only table
     //   we need to support partition key + sort key table
     let keyName = this.tableKeySetting[table];
+    context.logger.log('debug', 'kv.put keyName', {keyName: keyName});
+
     params.Item[keyName] = key;
 
     await dynamodb.put(params).promise();

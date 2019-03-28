@@ -1,6 +1,6 @@
 'use strict';
 
-const logger = require('../base/logger');
+const Middleware = require('./middleware');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
@@ -17,8 +17,9 @@ const store = new CrawlerBot({
   storage: storage,
 });
 
-exports.main = (event, context, cb) => {
-  logger.log('info', 'api request', event);
+exports.main = Middleware.handle((context) => {
+  let event = context.event;
+  context.logger.log('info', 'api request', event);
 
   const body = JSON.parse(event.body);
   let response = {};
@@ -28,7 +29,7 @@ exports.main = (event, context, cb) => {
     response.body = JSON.stringify({
       message: 'Bad Request',
     });
-    return cb(null, response);
+    return context.cb(null, response);
   }
 
   Promise.resolve()
@@ -39,22 +40,22 @@ exports.main = (event, context, cb) => {
           response.body = JSON.stringify({
             message: 'Bad Request',
           });
-          return cb(null, response);
+          return context.cb(null, response);
         }
 
         let types = [body.result.parameters.CurrencyType];
-        return store.queryCurrency(types);
+        return store.queryCurrency(context, types);
       } else if (body.result.action === 'query.currency.all') {
         let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
-        return store.queryCurrency(types);
+        return store.queryCurrency(context, types);
       } else if (body.result.action === 'subscription.subscribe') {
         let plat = body.originalRequest.source;
         let userID = body.originalRequest.data.source.userId;
-        return store.addSubscribeUser(plat, userID);
+        return store.addSubscribeUser(context, plat, userID);
       } else if (body.result.action === 'subscription.unsubscribe') {
         let plat = body.originalRequest.source;
         let userID = body.originalRequest.data.source.userId;
-        return store.delSubscribeUser(plat, userID);
+        return store.delSubscribeUser(context, plat, userID);
       } else {
         return Promise.resolve({text: '我不懂'});
       }
@@ -66,11 +67,11 @@ exports.main = (event, context, cb) => {
         displayText: data.text,
       });
 
-      logger.log('info', 'api response', response);
-      cb(null, response);
+      context.logger.log('info', 'api response', response);
+      context.cb(null, response);
     })
     .catch((err) => {
-      logger.log('error', 'api error', err);
-      cb(err);
+      context.logger.log('error', 'api error', err);
+      context.cb(err);
     });
-};
+});

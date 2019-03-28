@@ -1,6 +1,6 @@
 'use strict';
 
-const logger = require('../base/logger');
+const Middleware = require('./middleware');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
 const Event = require('../base/event');
@@ -19,19 +19,20 @@ const store = new Currency({
   client: httpclient,
 });
 
-exports.main = (event, context, cb) => {
-  logger.log('info', 'crawler start', event);
+exports.main = Middleware.handle((context) => {
+  let event = context.event;
+  context.logger.log('info', 'crawler start', event);
 
   Promise.resolve()
     .then(() => {
       let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
-      return store.crawlingCurrency(types);
+      return store.crawlingCurrency(context, types);
     })
     .then(() => {
-      cb();
+      context.cb();
     })
     .catch((err) => {
-      logger.log('error', 'crawler error', err);
-      cb(err);
+      context.logger.log('error', 'crawler error', err);
+      context.cb(err);
     });
-};
+});

@@ -79,21 +79,25 @@ const Currency = class {
   /**
    * Query currency information from source.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank.
    * @param {Array} types Currency type.
    * @return {Promise}
    */
-  async queryCurrency(bank, types) {
+  async queryCurrency(context, bank, types) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'queryCurrency',
     });
 
     // TODO support multiple currency source
     if (bank != 'BOT') {
+      context.logger.log('error', 'unsupport bank', {bank: bank});
       return {};
     }
 
-    let resp = await this.client.get(this.url);
+    let resp = await this.client.get(context, this.url);
+    context.logger.log('debug', 'queryCurrency response', {resp: resp});
+
     let info = this.parseCurrency(resp.body, types);
     info.date = this.parseDate(resp.headers['content-disposition']);
 
@@ -103,30 +107,35 @@ const Currency = class {
   /**
    * Crawling Currency.
    *
+   * @param {Context} context context.
    * @param {Array} types Currency types.
    * @return {Promise}
    */
-  async crawlingCurrency(types) {
+  async crawlingCurrency(context, types) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'crawlingCurrency',
     });
 
-    let curRec = await this.queryCurrency('BOT', types);
-    let cacheRec = await this.getCurrency('BOT');
+    let curRec = await this.queryCurrency(context, 'BOT', types);
+    let cacheRec = await this.getCurrency(context, 'BOT');
 
     if (Object.keys(cacheRec).length) {
       if (new Date(curRec.date) > new Date(cacheRec.date)) {
+        context.logger.log('debug', 'new record is found', curRec);
+
         let dateStr = moment(curRec.date).format('YYYYMMDD');
-        await this.addHistory('BOT', dateStr, curRec);
-        await this.putCurrency('BOT', curRec);
-        await this.event.publish(this.currencyChangedTopic, curRec);
+        await this.addHistory(context, 'BOT', dateStr, curRec);
+        await this.putCurrency(context, 'BOT', curRec);
+        await this.event.publish(context, this.currencyChangedTopic, curRec);
         return {};
       }
     } else {
+      context.logger.log('debug', 'new record is found', curRec);
+
       let dateStr = moment(curRec.date).format('YYYYMMDD');
-      await this.addHistory('BOT', dateStr, curRec);
-      await this.putCurrency('BOT', curRec);
-      await this.event.publish(this.currencyChangedTopic, curRec);
+      await this.addHistory(context, 'BOT', dateStr, curRec);
+      await this.putCurrency(context, 'BOT', curRec);
+      await this.event.publish(context, this.currencyChangedTopic, curRec);
       return {};
     }
 
@@ -136,15 +145,16 @@ const Currency = class {
   /**
    * Get currency information from cache.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank.
    * @return {Promise}
    */
-  async getCurrency(bank) {
+  async getCurrency(context, bank) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getCurrency',
     });
 
-    let record = await this.kv.get('currency', bank);
+    let record = await this.kv.get(context, 'currency', bank);
     if (!Object.keys(record).length) {
       return {};
     } else {
@@ -155,11 +165,12 @@ const Currency = class {
   /**
    * Put currency information from cache.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank.
    * @param {Object} data Currency data.
    * @return {Promise}
    */
-  async putCurrency(bank, data) {
+  async putCurrency(context, bank, data) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'putCurrency',
     });
@@ -168,27 +179,29 @@ const Currency = class {
       data: data,
     };
 
-    await this.kv.put('currency', bank, obj);
+    await this.kv.put(context, 'currency', bank, obj);
     return {};
   }
 
   /**
    * Get currency history.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank name.
    * @param {String} date Date.
    * @return {Promise}
    */
-  async getHistory(bank, date) {
+  async getHistory(context, bank, date) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getHistory',
     });
 
     try {
       let path = 'History/' + bank + '/' + date + '.json';
-      let record = await this.storage.get('currencybucket', path);
+      let record = await this.storage.get(context, 'currencybucket', path);
       return record.History;
     } catch (err) {
+      context.logger.log('error', 'getHistory error', {err: err});
       if (err instanceof NotFoundError) {
         return [];
       }
@@ -200,12 +213,13 @@ const Currency = class {
   /**
    * Put currency history.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank name.
    * @param {String} date Date.
    * @param {Array} history Currency history.
    * @return {Promise}
    */
-  async putHistory(bank, date, history) {
+  async putHistory(context, bank, date, history) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'putHistory',
     });
@@ -215,28 +229,29 @@ const Currency = class {
     };
 
     let path = 'History/' + bank + '/' + date + '.json';
-    await this.storage.put('currencybucket', path, obj);
+    await this.storage.put(context, 'currencybucket', path, obj);
     return {};
   }
 
   /**
    * Add currency history.
    *
+   * @param {Context} context context.
    * @param {String} bank Bank name.
    * @param {String} date Date.
    * @param {Object} info Currency information.
    * @return {Promise}
    */
-  async addHistory(bank, date, info) {
+  async addHistory(context, bank, date, info) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'addHistory',
     });
 
     // FIXME this is not atomic operation, it may cause racing issue
-    let history = await this.getHistory(bank, date);
+    let history = await this.getHistory(context, bank, date);
     history.push(info);
 
-    await this.putHistory(bank, date, history);
+    await this.putHistory(context, bank, date, history);
     return {};
   }
 };

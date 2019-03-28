@@ -16,11 +16,12 @@ const Storage = class {
    * Get from storage.
    *   currently we only support json object
    *
+   * @param {Context} context context.
    * @param {String} bucket bucket name.
    * @param {String} path file path.
    * @return {Promise}
    */
-  async get(bucket, path) {
+  async get(context, bucket, path) {
     let params = {
       Bucket: bucket,
       Key: path,
@@ -44,12 +45,13 @@ const Storage = class {
    * Put to storage.
    *   currently we only support storing json object
    *
+   * @param {Context} context context.
    * @param {String} bucket bucket name.
    * @param {String} path file path.
    * @param {Object} data data to store.
    * @return {Promise}
    */
-  async put(bucket, path, data) {
+  async put(context, bucket, path, data) {
     let params = {
       Bucket: bucket,
       Key: path,

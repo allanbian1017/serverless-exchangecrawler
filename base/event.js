@@ -15,11 +15,12 @@ const Event = class {
    * Publish a event with message.
    *   currently we only support to publish json object
    *
+   * @param {Context} context context.
    * @param {String} topic topic arn.
    * @param {Object} msg msg to publish.
    * @return {Promise}
    */
-  async publish(topic, msg) {
+  async publish(context, topic, msg) {
     let params = {
       TopicArn: topic,
       Message: JSON.stringify(msg),

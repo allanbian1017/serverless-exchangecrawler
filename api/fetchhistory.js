@@ -1,7 +1,7 @@
 'use strict';
 
+const Middleware = require('./middleware');
 const moment = require('moment');
-const logger = require('../base/logger');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
 
@@ -10,8 +10,9 @@ const store = new Currency({
   storage: storage,
 });
 
-exports.main = (event, context, cb) => {
-  logger.log('info', 'api request', event);
+exports.main = Middleware.handle((context) => {
+  let event = context.event;
+  context.logger.log('info', 'api request', event);
 
   let response = {
     statusCode: 200,
@@ -23,22 +24,22 @@ exports.main = (event, context, cb) => {
   Promise.resolve()
     .then(() => {
       let bank = 'BOT';
-      let date = event.pathParameters.date;
-      return store.getHistory(bank, date);
+      let date = event.path.date;
+      return store.getHistory(context, bank, date);
     })
     .then((data) => {
-      if (moment().format('YYYYMMDD') !== event.pathParameters.date) {
+      if (moment().format('YYYYMMDD') !== event.path.date) {
         response.headers['cache-control'] = 'public, max-age=31536000';
       } else {
         response.headers['cache-control'] = 'public, max-age=1800';
       }
 
       response.body = JSON.stringify({History: data});
-      logger.log('info', 'api response', response);
-      cb(null, response);
+      context.logger.log('info', 'api response', response);
+      context.cb(null, response);
     })
     .catch((err) => {
-      logger.log('error', 'api error', err);
-      cb(err);
+      context.logger.log('error', 'api error', err);
+      context.cb(err);
     });
-};
+});

@@ -1,5 +1,7 @@
 process.env.DATADOG_API_KEY = 'justfortest';
 
+const logger = require('../base/logger');
+const Context = require('../base/context');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
 const Event = require('../base/event');
@@ -33,8 +35,10 @@ describe('Currency', function() {
   let event;
   let client;
   let store;
+  let context;
 
   before(function() {
+    context = new Context({logger: logger});
     kv = new KV();
     storage = new Storage();
     event = new Event();
@@ -77,19 +81,19 @@ describe('Currency', function() {
 
       sandbox
         .stub(client, 'get')
-        .withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day')
+        .withArgs(context, 'http://rate.bot.com.tw/xrt/fltxt/0/day')
         .resolves(fixedObj)
         .withArgs()
         .rejects();
       sandbox
         .stub(kv, 'get')
-        .withArgs('currency', 'BOT')
+        .withArgs(context, 'currency', 'BOT')
         .resolves(testCachedObj)
         .withArgs()
         .rejects();
       sandbox
         .stub(storage, 'get')
-        .withArgs('currencybucket', path)
+        .withArgs(context, 'currencybucket', path)
         .resolves(testHistory)
         .withArgs()
         .rejects();
@@ -97,20 +101,20 @@ describe('Currency', function() {
         .mock(storage)
         .expects('put')
         .once()
-        .withArgs('currencybucket', path, sinon.match.any);
+        .withArgs(context, 'currencybucket', path, sinon.match.any);
       sandbox
         .mock(kv)
         .expects('put')
         .once()
-        .withArgs('currency', 'BOT', sinon.match.any);
+        .withArgs(context, 'currency', 'BOT', sinon.match.any);
       sandbox
         .mock(event)
         .expects('publish')
         .once()
-        .withArgs('testTopic', sinon.match.has('USD', 30.312));
+        .withArgs(context, 'testTopic', sinon.match.has('USD', 30.312));
 
       return store
-        .crawlingCurrency(['USD'])
+        .crawlingCurrency(context, ['USD'])
         .then(function() {
           sandbox.verify();
           return Promise.resolve();
@@ -139,13 +143,13 @@ describe('Currency', function() {
 
       sandbox
         .stub(client, 'get')
-        .withArgs('http://rate.bot.com.tw/xrt/fltxt/0/day')
+        .withArgs(context, 'http://rate.bot.com.tw/xrt/fltxt/0/day')
         .resolves(fixedObj)
         .withArgs()
         .rejects();
 
       return store
-        .queryCurrency('BOT', ['USD'])
+        .queryCurrency(context, 'BOT', ['USD'])
         .then(function(data) {
           expect(data).to.have.property('USD', expectUSD);
           return Promise.resolve();
@@ -198,13 +202,13 @@ describe('Currency', function() {
 
       sandbox
         .stub(storage, 'get')
-        .withArgs('currencybucket', expectPath)
+        .withArgs(context, 'currencybucket', expectPath)
         .resolves(testData)
         .withArgs()
         .rejects();
 
       return store
-        .getHistory(testBank, testDate)
+        .getHistory(context, testBank, testDate)
         .then(function(data) {
           expect(data).to.deep.equal(expectData);
           return Promise.resolve();

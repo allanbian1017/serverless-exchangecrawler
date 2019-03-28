@@ -1,5 +1,7 @@
 process.env.DATADOG_API_KEY = 'justfortest';
 
+const logger = require('../base/logger');
+const Context = require('../base/context');
 const Storage = require('../base/storage');
 const Bot = require('../base/bot');
 const Currency = require('../store/currency');
@@ -12,8 +14,10 @@ describe('CrawlerBot', function() {
   let currency;
   let bot;
   let store;
+  let context;
 
   before(function() {
+    context = new Context({logger: logger});
     storage = new Storage();
     bot = new Bot();
     currency = new Currency({});
@@ -49,13 +53,13 @@ describe('CrawlerBot', function() {
 
       sandbox
         .stub(currency, 'getCurrency')
-        .withArgs('BOT')
+        .withArgs(context, 'BOT')
         .resolves(testHist)
         .withArgs()
         .rejects();
 
       return store
-        .queryCurrency(testTypes)
+        .queryCurrency(context, testTypes)
         .then(function(data) {
           expect(data.text).to.equal(expectMsg);
           return Promise.resolve();
@@ -66,7 +70,7 @@ describe('CrawlerBot', function() {
     });
   });
 
-  describe('#broadcastMessage()', function() {
+  describe('#broadcastCurrency()', function() {
     let sandbox;
 
     beforeEach(function() {
@@ -103,7 +107,7 @@ describe('CrawlerBot', function() {
 
       sandbox
         .stub(storage, 'get')
-        .withArgs(expectBucket, expectPath)
+        .withArgs(context, expectBucket, expectPath)
         .resolves(expectObj)
         .withArgs()
         .rejects();
@@ -111,10 +115,10 @@ describe('CrawlerBot', function() {
         .mock(bot)
         .expects('publish')
         .once()
-        .withArgs(testPlat, expectUsers, expectMsg);
+        .withArgs(context, testPlat, expectUsers, expectMsg);
 
       return store
-        .broadcastCurrency(testPlat, testCurrency)
+        .broadcastCurrency(context, testPlat, testCurrency)
         .then(function() {
           sandbox.verify();
           return Promise.resolve();
@@ -151,19 +155,19 @@ describe('CrawlerBot', function() {
 
       sandbox
         .stub(storage, 'get')
-        .withArgs(expectBucket, expectPath)
+        .withArgs(context, expectBucket, expectPath)
         .resolves(testObj)
         .withArgs()
         .rejects();
       sandbox
         .stub(storage, 'put')
-        .withArgs(expectBucket, expectPath, expectObj)
+        .withArgs(context, expectBucket, expectPath, expectObj)
         .resolves()
         .withArgs()
         .rejects();
 
       return store
-        .addSubscribeUser(testPlat, testUserId)
+        .addSubscribeUser(context, testPlat, testUserId)
         .then(function(data) {
           expect(data.text).to.equal(expectMsg);
           return Promise.resolve();
@@ -200,19 +204,19 @@ describe('CrawlerBot', function() {
 
       sandbox
         .stub(storage, 'get')
-        .withArgs(expectBucket, expectPath)
+        .withArgs(context, expectBucket, expectPath)
         .resolves(testObj)
         .withArgs()
         .rejects();
       sandbox
         .stub(storage, 'put')
-        .withArgs(expectBucket, expectPath, expectObj)
+        .withArgs(context, expectBucket, expectPath, expectObj)
         .resolves()
         .withArgs()
         .rejects();
 
       return store
-        .delSubscribeUser(testPlat, testUserId)
+        .delSubscribeUser(context, testPlat, testUserId)
         .then(function(data) {
           expect(data.text).to.equal(expectMsg);
           return Promise.resolve();

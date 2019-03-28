@@ -23,19 +23,21 @@ const CrawlerBot = class {
   /**
    * Get bot users.
    *
+   * @param {Context} context context.
    * @param {String} plat Bot platform.
    * @return {Promise}
    */
-  async getUsers(plat) {
+  async getUsers(context, plat) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
       func: 'getUsers',
     });
 
     try {
       let path = 'Users/' + plat + '.json';
-      let record = await this.storage.get('currencybucket', path);
+      let record = await this.storage.get(context, 'currencybucket', path);
       return record.Users;
     } catch (err) {
+      context.logger.log('error', 'getUsers error', {err: err});
       if (err instanceof NotFoundError) {
         return {};
       }
@@ -47,11 +49,12 @@ const CrawlerBot = class {
   /**
    * Put bot users.
    *
+   * @param {Context} context context.
    * @param {String} plat Bot platform.
    * @param {Object} users Bot users.
    * @return {Promise}
    */
-  async putUsers(plat, users) {
+  async putUsers(context, plat, users) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
       func: 'putUsers',
     });
@@ -61,67 +64,70 @@ const CrawlerBot = class {
     };
 
     let path = 'Users/' + plat + '.json';
-    await this.storage.put('currencybucket', path, obj);
+    await this.storage.put(context, 'currencybucket', path, obj);
     return {};
   }
 
   /**
    * Add bot user.
    *
+   * @param {Context} context context.
    * @param {String} plat Bot platform.
    * @param {Object} user Bot user.
    * @return {Promise}
    */
-  async addSubscribeUser(plat, user) {
+  async addSubscribeUser(context, plat, user) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
       func: 'addSubscribeUser',
     });
 
     // FIXME this is not atomic operation, it may cause racing issue
-    let users = await this.getUsers(plat);
+    let users = await this.getUsers(context, plat);
     users.push(user);
-    await this.putUsers(plat, users);
+    await this.putUsers(context, plat, users);
     return {text: '訂閱成功'};
   }
 
   /**
    * Delete bot user.
    *
+   * @param {Context} context context.
    * @param {String} plat Bot platform.
    * @param {Object} user Bot user.
    * @return {Promise}
    */
-  async delSubscribeUser(plat, user) {
+  async delSubscribeUser(context, plat, user) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
       func: 'delSubscribeUser',
     });
 
     // FIXME this is not atomic operation, it may cause racing issue
-    let users = await this.getUsers(plat);
+    let users = await this.getUsers(context, plat);
     let idx = users.indexOf(user);
     if (idx !== -1) {
       users.splice(idx, 1);
     }
 
-    await this.putUsers(plat, users);
+    await this.putUsers(context, plat, users);
     return {text: '取消訂閱成功'};
   }
 
   /**
    * Broadcase currency information to all users to assigned bot platform.
    *
+   * @param {Context} context context.
    * @param {String} plat Bot platform.
    * @param {Object} currency currency object to broadcast.
    * @return {Promise}
    */
-  async broadcastCurrency(plat, currency) {
+  async broadcastCurrency(context, plat, currency) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
-      func: 'broadcastMessage',
+      func: 'broadcastCurrency',
     });
 
     let msg = this.getCurrencyMsg(currency);
-    let users = await this.getUsers(plat);
-    await this.bot.publish(plat, users, msg);
+    let users = await this.getUsers(context, plat);
+    await this.bot.publish(context, plat, users, msg);
     return {};
   }
 
@@ -152,19 +158,22 @@ const CrawlerBot = class {
   /**
    * Query Currency.
    *
+   * @param {Context} context context.
    * @param {Array} types Currency types.
    * @return {Promise}
    */
-  async queryCurrency(types) {
+  async queryCurrency(context, types) {
     metrics.count('exchange-crawler.CrawlerBot', 1, {
       func: 'queryCurrency',
     });
 
-    let record = await this.currency.getCurrency('BOT');
+    let record = await this.currency.getCurrency(context, 'BOT');
     if (!Object.keys(record).length) {
       return {text: '您好\n'};
     } else {
       let currency = {};
+      context.logger.log('debug', 'currency record is found', record);
+
       currency.date = record.date;
       types.forEach((x) => {
         currency[x] = record[x];

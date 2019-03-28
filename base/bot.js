@@ -12,12 +12,13 @@ const Bot = class {
   /**
    * Bot publish message.
    *
+   * @param {Context} context context.
    * @param {String} plat platform to publish message.
    * @param {Array} users users to publish.
    * @param {String} msg text to publish.
    * @return {Promise}
    */
-  async publish(plat, users, msg) {
+  async publish(context, plat, users, msg) {
     switch (plat) {
       case 'line':
         let lineClient = new line.Client({
