@@ -125,6 +125,7 @@ const CrawlerBot = class {
       func: 'broadcastCurrency',
     });
 
+    context.logger.log('debug', 'broadcase currency', currency);
     let msg = this.getCurrencyMsg(currency);
     let users = await this.getUsers(context, plat);
     await this.bot.publish(context, plat, users, msg);

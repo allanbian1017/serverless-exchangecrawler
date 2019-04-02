@@ -4,7 +4,6 @@ const logger = require('../base/logger');
 const Context = require('../base/context');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
-const Event = require('../base/event');
 const HttpClient = require('../base/httpclient');
 const Currency = require('../store/currency');
 const expect = require('chai').expect;
@@ -32,7 +31,6 @@ describe('Currency', function() {
 
   let kv;
   let storage;
-  let event;
   let client;
   let store;
   let context;
@@ -41,12 +39,10 @@ describe('Currency', function() {
     context = new Context({logger: logger});
     kv = new KV();
     storage = new Storage();
-    event = new Event();
     client = new HttpClient();
     store = new Currency({
       kv: kv,
       storage: storage,
-      event: event,
       client: client,
       currencyChangedTopic: 'testTopic',
     });
@@ -107,11 +103,6 @@ describe('Currency', function() {
         .expects('put')
         .once()
         .withArgs(context, 'currency', 'BOT', sinon.match.any);
-      sandbox
-        .mock(event)
-        .expects('publish')
-        .once()
-        .withArgs(context, 'testTopic', sinon.match.has('USD', 30.312));
 
       return store
         .crawlingCurrency(context, ['USD'])

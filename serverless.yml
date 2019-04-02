@@ -13,26 +13,30 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:PutItem
-      Resource: "arn:aws:dynamodb:us-east-1:*:*"
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource: 'arn:aws:dynamodb:us-east-1:*:*'
     - Effect: Allow
       Action:
         - s3:GetObject
         - s3:PutObject
-      Resource: "*"
+      Resource: '*'
     - Effect: Allow
       Action:
         - sns:Publish
-      Resource: "arn:aws:sns:us-east-1:*:*"
+      Resource: 'arn:aws:sns:us-east-1:*:*'
     - Effect: Allow
       Action:
         - xray:PutTraceSegments
         - xray:PutTelemetryRecords
-      Resource: "*"
+      Resource: '*'
 
   environment:
     CURRENCY_CHANGED_SNS_ARN:
       Fn::Join:
-        - ":"
+        - ':'
         - - arn
           - aws
           - sns
@@ -50,7 +54,7 @@ plugins:
 
 custom:
   webpack:
-    webpackConfig: "webpack.config.js"
+    webpackConfig: 'webpack.config.js'
     includeModules:
       forceExclude:
         - aws-sdk
@@ -70,6 +74,8 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
     currencyStorage:
       Type: AWS::S3::Bucket
       Properties:
@@ -91,7 +97,12 @@ functions:
   LinePub:
     handler: api/linepub.main
     events:
-      - sns: currencychanged
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - currencyTable
+              - StreamArn
     environment:
       LINE_ACCESSTOKEN: ${ssm:/exchangecrawler/LINE_ACCESSTOKEN}
       LINE_SECRET: ${ssm:/exchangecrawler/LINE_SECRET}

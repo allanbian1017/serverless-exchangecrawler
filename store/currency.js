@@ -12,7 +12,6 @@ const Currency = class {
    * @param {Object} options JSON configuration.
    * @param {Object} options.kv KV object.
    * @param {Object} options.storage Storage object.
-   * @param {Object} options.event Event object.
    * @param {String} options.currencyChangedTopic the topic arn
    *  which will publish event when currency changed.
    * @param {Object} options.client HttpClient object.
@@ -20,7 +19,6 @@ const Currency = class {
   constructor(options) {
     this.kv = options.kv;
     this.storage = options.storage;
-    this.event = options.event;
     this.currencyChangedTopic = options.currencyChangedTopic;
     this.client = options.client;
     this.url = 'http://rate.bot.com.tw/xrt/fltxt/0/day';
@@ -105,6 +103,51 @@ const Currency = class {
   }
 
   /**
+   * Parse Currency object from DynamoDB Stream record.
+   *
+   * DynamoDB Stream record:
+   * {
+   *  "bank": {
+   *    "S": "BOT"
+   *  },
+   *  "data": {
+   *    "M": {
+   *      "date": {
+   *        "N": "1553788800000"
+   *      },
+   *      "USD": {
+   *        "N": "31.115"
+   *      }
+   *    }
+   *  }
+   * }
+   *
+   * @param {Context} context context.
+   * @param {Object} record DynamoDB Stream record.
+   * @return {Object}
+   */
+  parseCurrencyFromDynamoDBStream(context, record) {
+    context.logger.log('debug', 'parse record', record);
+    if (!record.data || !record.data.M) {
+      return {};
+    }
+
+    let obj = record.data.M;
+    let currencyObj = {};
+    Object.keys(obj).forEach((x) => {
+      if (obj[x].N) {
+        if (x == 'date') {
+          currencyObj[x] = parseInt(obj[x].N, 10);
+        } else {
+          currencyObj[x] = parseFloat(obj[x].N);
+        }
+      }
+    });
+
+    return currencyObj;
+  }
+
+  /**
    * Crawling Currency.
    *
    * @param {Context} context context.
@@ -126,7 +169,6 @@ const Currency = class {
         let dateStr = moment(curRec.date).format('YYYYMMDD');
         await this.addHistory(context, 'BOT', dateStr, curRec);
         await this.putCurrency(context, 'BOT', curRec);
-        await this.event.publish(context, this.currencyChangedTopic, curRec);
         return {};
       }
     } else {
@@ -135,7 +177,6 @@ const Currency = class {
       let dateStr = moment(curRec.date).format('YYYYMMDD');
       await this.addHistory(context, 'BOT', dateStr, curRec);
       await this.putCurrency(context, 'BOT', curRec);
-      await this.event.publish(context, this.currencyChangedTopic, curRec);
       return {};
     }
 

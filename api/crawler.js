@@ -3,18 +3,15 @@
 const Middleware = require('./middleware');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
-const Event = require('../base/event');
 const HttpClient = require('../base/httpclient');
 const Currency = require('../store/currency');
 
-const event = new Event();
 const httpclient = new HttpClient();
 const kv = new KV();
 const storage = new Storage();
 const store = new Currency({
   kv: kv,
   storage: storage,
-  event: event,
   currencyChangedTopic: process.env.CURRENCY_CHANGED_SNS_ARN,
   client: httpclient,
 });
