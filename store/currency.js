@@ -251,6 +251,71 @@ const Currency = class {
     }
   }
 
+
+  /**
+   * Get history by time interval.
+   *
+   * @param {Context} context context.
+   * @param {String} bank Bank name.
+   * @param {String} start Date.
+   * @param {String} end Date.
+   * @return {Promise}
+   */
+  async getIntervalHistory(context, bank, start, end) {
+    metrics.count('exchange-crawler.Currency', 1, {
+      func: 'getHistorybyInterval',
+    });
+    moment.defaultFormat = 'YYYY.MM.DD';
+    const startTime = (moment(start).valueOf());
+    const endtTime = (moment(end).valueOf());
+    const dailyLisyt = getDailyList(startTime, endtTime);
+    let historyRate = [];
+
+    await dailyLisyt.forEach( (date) =>{
+      let dailyRate = {};
+      dailyRate.Data = getHistory(context, bank, date);
+      dailyRate.Date = date;
+      historyRate.push(dailyRate);
+    });
+    return historyRate;
+  }
+
+  /**
+   * Currency Filter.
+   * @param {String} data history rate.
+   * @param {String} currency filter by Currency.
+   * @return {Promise}
+   */
+  async currencyFilter(data, currency) {
+    let currencyRate=[];
+    await data.forEach((rate)=>{
+      dailyRate.Date=rate.date;
+      dailyRate.Rate=rate.data.currency;
+      currencyRate.push(dailyRate);
+    });
+    return currencyRate;
+  }
+
+  /**
+   * Get currency history.
+   *
+   * @param {Context} context context.
+   * @param {String} bank Bank name.
+   * @param {String} start Date.
+   * @param {String} end Date.
+   * @param {String} currency Search currency.
+   * @return {Promise}
+   */
+  async getHistoryByCurrency(context, bank, start, end, currency) {
+    metrics.count('exchange-crawler.Currency', 1, {
+      func: 'getHistoryByCurrency',
+    });
+    let intervalHistory = await getIntervalHistory(start, end, currency, bank);
+    let currencyHistory = await currencyFilter(intervalHistory, currency);
+    return currencyHistory;
+  };
+
+
   /**
    * Put currency history.
    *
