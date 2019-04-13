@@ -251,6 +251,27 @@ const Currency = class {
     }
   }
 
+  /**
+   * Get Daily List.
+   *
+   * @param {Context} context context.
+   * @param {String} start Date.
+   * @param {String} end Date.
+   * @return {Promise}
+   */
+  getDailyList(context, start, end) {
+    return new Promise((resolve) => {
+      let dateList = [];
+      let dateTime = 0;
+      const date = (end- start) /86400000;
+
+      for (let i=0; i<=date; i++) {
+          dateTime = start+(i*86400000);
+          dateList.push(moment(dateTime).format('YYYYMMDD'));
+      }
+      return resolve(dateList);
+    });
+  }
 
   /**
    * Get history by time interval.
@@ -268,53 +289,17 @@ const Currency = class {
     moment.defaultFormat = 'YYYY.MM.DD';
     const startTime = (moment(start).valueOf());
     const endtTime = (moment(end).valueOf());
-    const dailyLisyt = getDailyList(startTime, endtTime);
+    const dailyLisyt =await getDailyList(startTime, endtTime);
     let historyRate = [];
 
     await dailyLisyt.forEach( (date) =>{
       let dailyRate = {};
-      dailyRate.Data = getHistory(context, bank, date);
+      dailyRate.rate = getHistory(context, bank, date);
       dailyRate.Date = date;
       historyRate.push(dailyRate);
     });
     return historyRate;
   }
-
-  /**
-   * Currency Filter.
-   * @param {String} data history rate.
-   * @param {String} currency filter by Currency.
-   * @return {Promise}
-   */
-  async currencyFilter(data, currency) {
-    let currencyRate=[];
-    await data.forEach((rate)=>{
-      dailyRate.Date=rate.date;
-      dailyRate.Rate=rate.data.currency;
-      currencyRate.push(dailyRate);
-    });
-    return currencyRate;
-  }
-
-  /**
-   * Get currency history.
-   *
-   * @param {Context} context context.
-   * @param {String} bank Bank name.
-   * @param {String} start Date.
-   * @param {String} end Date.
-   * @param {String} currency Search currency.
-   * @return {Promise}
-   */
-  async getHistoryByCurrency(context, bank, start, end, currency) {
-    metrics.count('exchange-crawler.Currency', 1, {
-      func: 'getHistoryByCurrency',
-    });
-    let intervalHistory = await getIntervalHistory(start, end, currency, bank);
-    let currencyHistory = await currencyFilter(intervalHistory, currency);
-    return currencyHistory;
-  };
-
 
   /**
    * Put currency history.
