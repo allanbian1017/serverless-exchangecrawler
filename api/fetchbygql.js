@@ -12,7 +12,7 @@ const store = new Currency({
 const { graphql, buildSchema } = require('graphql');
 
 const schema = buildSchema(`
-  enum currency {
+  enum Currency {
     JPY
     USD
     CNY
@@ -24,7 +24,7 @@ const schema = buildSchema(`
   }
   
   type Query {
-    history(Country: currency! , startDate: String!, endDate: String!): [History]!
+    history(currency: Currency! , startDate: String!, endDate: String!): [History]!
   }
 `);
 
