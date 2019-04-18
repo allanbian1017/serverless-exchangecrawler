@@ -1,6 +1,6 @@
 'use strict';
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
 const NotFoundError = require('../base/error');
 const metrics = new Metrics();
@@ -71,7 +71,7 @@ const Currency = class {
       data.indexOf('@') + 1,
       data.indexOf('.') - data.indexOf('@') - 1
     );
-    return moment(date, 'YYYYMMDDhhmm').valueOf();
+    return moment.tz(date, 'YYYYMMDDhhmm', 'Asia/Taipei').valueOf();
   }
 
   /**

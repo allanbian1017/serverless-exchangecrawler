@@ -129,6 +129,7 @@ describe('Currency', function() {
 
     it('should get USD exchange rate information', function() {
       const expectUSD = 30.312;
+      const expectTimestamp = 1495008420000;
       let fixedObj = {body: fixedBody, headers: {}};
       fixedObj.headers['content-disposition'] = fixedContentHeaders;
 
@@ -143,6 +144,7 @@ describe('Currency', function() {
         .queryCurrency(context, 'BOT', ['USD'])
         .then(function(data) {
           expect(data).to.have.property('USD', expectUSD);
+          expect(data).to.have.property('date', expectTimestamp);
           return Promise.resolve();
         })
         .catch(function(err) {

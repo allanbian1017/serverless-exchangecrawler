@@ -44,7 +44,7 @@ describe('CrawlerBot', function() {
       const expectMsg =
         '您好\n' + '美金匯率30\n' + '更新時間:2017-09-20 10:04\n' + '供您参考';
       const testHist = {
-        date: 1505901840000,
+        date: 1505873040000,
         USD: 30,
         JPY: 0.27,
         AUD: 22,
@@ -83,7 +83,7 @@ describe('CrawlerBot', function() {
 
     it('should execute success without error', function() {
       const testCurrency = {
-        date: 1505901840000,
+        date: 1505873040000,
         USD: 30,
         JPY: 0.27,
         AUD: 22,

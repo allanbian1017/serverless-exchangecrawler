@@ -1,6 +1,6 @@
 'use strict';
 
-const moment = require('moment');
+const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
 const NotFoundError = require('../base/error');
 const metrics = new Metrics();
@@ -151,7 +151,11 @@ const CrawlerBot = class {
     if (data.HKD) msg += '港幣匯率' + data.HKD + '\n';
 
     msg +=
-      '更新時間:' + moment.utc(data.date).format('YYYY-MM-DD hh:mm') + '\n';
+      '更新時間:' +
+      moment(data.date)
+        .tz('Asia/Taipei')
+        .format('YYYY-MM-DD hh:mm') +
+      '\n';
     msg += '供您参考';
     return msg;
   }

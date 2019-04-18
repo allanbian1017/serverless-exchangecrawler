@@ -1,11 +1,19 @@
 'use strict';
 
-const AWS = require('aws-sdk');
-const moment = require('moment');
-const CurrencyHistory = require('../lib/currencyhistory');
+const moment = require('moment-timezone');
+const Storage = require('../base/storage');
+const Currency = require('../store/currency');
+const logger = require('../base/logger');
+const Context = require('../base/context');
 
-const s3 = new AWS.S3();
-const history = new CurrencyHistory({storage: s3});
+const storage = new Storage();
+const store = new Currency({
+  storage: storage,
+});
+
+let context = new Context({
+  logger: logger,
+});
 
 let from = moment(new Date(2017, 8, 21));
 let now = moment();
@@ -20,32 +28,32 @@ for (let m = from; m.isBefore(now); m.add(1, 'days')) {
 }
 
 let p = [];
-dates.forEach((d) => {
+dates.forEach((date) => {
   p.push(
-    history
-      .get('BOT', d)
+    store
+      .getHistory(context, 'BOT', date)
       .then((data) => {
-        let items = [];
-
         if (data.length !== 0) {
+          let items = [];
           data.forEach((item) => {
             let newItem = item;
-            let timestamp = moment(newItem.date).valueOf();
+            // since current timestamp has +8 hour offset compare to
+            //   UTC timestamp, we need correct UTC timestamp,
+            //   therefore we modify timestamp by shift -8 hour to
+            //   current timestamp
+            let timestamp = moment(newItem.date)
+              .subtract(8, 'h')
+              .valueOf();
             newItem.date = timestamp;
             items.push(newItem);
           });
 
-          return history.put('BOT', d, items);
+          return store.putHistory(context, 'BOT', date, items);
         }
 
         return Promise.resolve();
       })
       .catch((err) => {
-        console.error(err);
-        if (err.code === 'NotFound') {
-          return Promise.resolve();
-        }
-
         return Promise.reject(err);
       })
   );
