@@ -89,12 +89,12 @@ const Currency = class {
 
     // TODO support multiple currency source
     if (bank != 'BOT') {
-      context.logger.log('error', 'unsupport bank', {bank: bank});
+      context.logger.log('error', 'unsupport bank', { bank: bank });
       return {};
     }
 
     let resp = await this.client.get(context, this.url);
-    context.logger.log('debug', 'queryCurrency response', {resp: resp});
+    context.logger.log('debug', 'queryCurrency response', { resp: resp });
 
     let info = this.parseCurrency(resp.body, types);
     info.date = this.parseDate(resp.headers['content-disposition']);
@@ -232,7 +232,7 @@ const Currency = class {
    * @param {String} date Date.
    * @return {Promise}
    */
-  async getHistory(context, bank, date) {
+  getHistory(context, bank, date) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getHistory',
     });
@@ -242,7 +242,7 @@ const Currency = class {
       let record = await this.storage.get(context, 'currencybucket', path);
       return record.History;
     } catch (err) {
-      context.logger.log('error', 'getHistory error', {err: err});
+      context.logger.log('error', 'getHistory error', { err: err });
       if (err instanceof NotFoundError) {
         return [];
       }
@@ -259,18 +259,16 @@ const Currency = class {
    * @param {String} end Date.
    * @return {Promise}
    */
-  getDailyList(context, start, end) {
-    return new Promise((resolve) => {
-      let dateList = [];
-      let dateTime = 0;
-      const date = (end- start) /86400000;
+  getDatesBetweenTimes(context, startTime, endTime) {
 
-      for (let i=0; i<=date; i++) {
-          dateTime = start+(i*86400000);
-          dateList.push(moment(dateTime).format('YYYYMMDD'));
-      }
-      return resolve(dateList);
-    });
+    let dateList = [];
+    let dateTime = 0;
+    const betweenDates = (endTime - startTime) / 86400000;
+
+    for (let i = 0; i <= betweenDates; i++) {
+      dateList.push(moment(startTime).add(i, 'd').format('YYYYMMDD'));
+    }
+    return dateList;
   }
 
   /**
@@ -282,23 +280,23 @@ const Currency = class {
    * @param {String} end Date.
    * @return {Promise}
    */
-  async getIntervalHistory(context, bank, start, end) {
+  async getHistoryByDates(context, bank, startDate, endDate) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getHistorybyInterval',
     });
-    moment.defaultFormat = 'YYYY.MM.DD';
-    const startTime = (moment(start).valueOf());
-    const endtTime = (moment(end).valueOf());
-    const dailyLisyt =await getDailyList(startTime, endtTime);
-    let historyRate = [];
+    moment().format("YYYYMMDD");
+    const startTime = moment(startDate).valueOf();
+    const endtTime = moment(endDate).valueOf();
+    const dates = await getDatesBetweenTimes(startTime, endtTime);
+    let rates = [];
 
-    await dailyLisyt.forEach( (date) =>{
+    dates.forEach((date) => {
       let dailyRate = {};
-      dailyRate.rate = getHistory(context, bank, date);
+      dailyRate.rate = await getHistory(context, bank, date);
       dailyRate.Date = date;
-      historyRate.push(dailyRate);
+      rates.push(dailyRate);
     });
-    return historyRate;
+    return rates;
   }
 
   /**
