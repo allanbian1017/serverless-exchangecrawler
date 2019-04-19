@@ -55,7 +55,7 @@ module.main = Middleware.handle((context) => {
     },
   };
   graphql(schema, event.body, resolvers)
-  .then((resolve)=>{
-    context.cb(resolve);
+  .then((result)=>{
+    context.cb(null, result);
   });
 });
