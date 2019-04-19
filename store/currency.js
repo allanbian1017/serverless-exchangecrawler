@@ -287,14 +287,14 @@ const Currency = class {
     moment().format("YYYYMMDD");
     const startTime = moment(startDate).valueOf();
     const endtTime = moment(endDate).valueOf();
-    const dates = await getDatesBetweenTimes(startTime, endtTime);
+    const dates = getDatesBetweenTimes(startTime, endtTime);
     let rates = [];
 
     dates.forEach((date) => {
-      let dailyRate = {};
-      dailyRate.rate = await getHistory(context, bank, date);
-      dailyRate.Date = date;
-      rates.push(dailyRate);
+      let rate = {};
+      rate.rate = await getHistory(context, bank, date);
+      rate.Date = date;
+      rates.push(rate);
     });
     return rates;
   }
