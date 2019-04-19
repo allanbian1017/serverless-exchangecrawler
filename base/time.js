@@ -25,7 +25,9 @@ const Time = class {
         dateList.push(curDate.format('YYYYMMDD'));
         curDate = curDate.add(1, 'd');
       }
-      dateList.push(startDate);
+      dateList.push(curDate.format('YYYYMMDD'));
+      console.log(dateList);
+
       return dateList;
     };
 };
