@@ -25,7 +25,7 @@ describe('Time', function() {
             let startDate = '20190222';
             let endDate = '20190301';
 
-            let dates = time.getDatesBetween(context, startDate, endDate)
+            let dates = time.getDatesBetween(context, startDate, endDate);
             expect(dates).to.deep.equal(expectData);
             return Promise.resolve();
         });
