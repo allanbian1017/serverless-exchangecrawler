@@ -261,7 +261,7 @@ const Currency = class {
    */
   async getHistoryByDates(context, bank, dates) {
     metrics.count('exchange-crawler.Currency', 1, {
-      func: 'getHistorybyInterval',
+      func: 'getHistoryByDates',
     });
     let rates = [];
     asyncForEach(dates, async (date) => {
