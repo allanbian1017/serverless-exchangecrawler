@@ -242,7 +242,7 @@ const Currency = class {
       let record = await this.storage.get(context, 'currencybucket', path);
       return record.History;
     } catch (err) {
-      context.logger.log('error', 'getHistory error', { err: err });
+      context.logger.log('error', 'getHistory error', {err: err});
       if (err instanceof NotFoundError) {
         return [];
       }
