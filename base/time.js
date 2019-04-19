@@ -18,7 +18,6 @@ const Time = class {
      * @return {Promise}
      */
     getDatesBetween(context, startDate, endDate) {
-      moment().format('YYYYMMDD');
       let dateList = [];
       let curDate = moment(startDate);
       while (curDate.isBefore(endDate)) {
@@ -26,7 +25,6 @@ const Time = class {
         curDate = curDate.add(1, 'd');
       }
       dateList.push(curDate.format('YYYYMMDD'));
-      console.log(dateList);
 
       return dateList;
     };
