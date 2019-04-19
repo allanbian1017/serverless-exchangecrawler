@@ -256,8 +256,7 @@ const Currency = class {
    *
    * @param {Context} context context.
    * @param {String} bank Bank name.
-   * @param {String} start Date.
-   * @param {String} end Date.
+   * @param {String} dates Dates.
    * @return {Promise}
    */
   async getHistoryByDates(context, bank, dates) {
@@ -265,7 +264,7 @@ const Currency = class {
       func: 'getHistorybyInterval',
     });
     let rates = [];
-    dates.forEach((date) => {
+    asyncForEach(dates, async (date) => {
       let rate = await getHistory(context, bank, date);
       rates.push(rate);
     });
