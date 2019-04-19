@@ -264,9 +264,9 @@ const Currency = class {
       func: 'getHistoryByDates',
     });
     let rates = [];
-    asyncForEach(dates, async (date) => {
+    dates.forEach(async (date) => {
       let rate = await getHistory(context, bank, date);
-      rates.push(rate);
+      rates.push(rate[0]);
     });
     return rates;
   }
