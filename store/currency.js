@@ -266,9 +266,7 @@ const Currency = class {
     });
     let rates = [];
     dates.forEach((date) => {
-      let rate = {};
-      rate.rate = await getHistory(context, bank, date);
-      rate.Date = date;
+      let rate = await getHistory(context, bank, api/fetchbygql.js );
       rates.push(rate);
     });
     return rates;

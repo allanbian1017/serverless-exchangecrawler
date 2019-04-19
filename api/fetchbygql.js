@@ -4,6 +4,7 @@ const Middleware = require('./middleware');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
 const Time = require('../basw/time');
+const moment = require('moment');
 
 const storage = new Storage();
 const store = new Currency({
@@ -45,7 +46,8 @@ module.main = Middleware.handle((context) => {
       let currencyRate = [];
       historyRate.forEach((element) => {
         dailyRate = {}
-        dailyRate.Date = element.date;
+        let timestamp = element.date;
+        dailyRate.Date = moment(timestamp).format('YYYYMMDD');
         dailyRate.Rate = element.rate.currency;
         currencyRate.push(dailyRate)
       });
