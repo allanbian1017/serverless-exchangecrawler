@@ -3,11 +3,13 @@
 const Middleware = require('./middleware');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
+const Time = require('../basw/time');
 
 const storage = new Storage();
 const store = new Currency({
   storage: storage,
 });
+const time = new Time()
 
 const { graphql, buildSchema } = require('graphql');
 
@@ -37,16 +39,19 @@ module.main = Middleware.handle((context) => {
       let startDate = args.startDate;
       let endDate = args.endDate;
       let currency = args.currency;
+      let dates = await time.getDatesBetween(startDate, endDate);
       let historyRate = await store.getHistoryByDates(
-        Context, startDate, endDate, bank);
-      let currencyRate = {};
+        Context, dates, bank);
+      let currencyRate = [];
       historyRate.forEach((element) => {
-        currencyRate.Date = element.date;
-        currencyRate.Rate = element.rate.currency;
+        dailyRate = {}
+        dailyRate.Date = element.date;
+        dailyRate.Rate = element.rate.currency;
+        currencyRate.push(dailyRate)
       });
       return currencyRate;
     },
   };
   const result = graphql(schema, event.body, resolvers);
-  return { statusCode: 200, body: JSON.stringify(result.data, null, 2) };
+  return Promise.resolve({ statusCode: 200, body: JSON.stringify(result.data, null, 2) });
 });

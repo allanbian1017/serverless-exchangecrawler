@@ -252,26 +252,6 @@ const Currency = class {
   }
 
   /**
-   * Get Daily List.
-   *
-   * @param {Context} context context.
-   * @param {String} start Date.
-   * @param {String} end Date.
-   * @return {Promise}
-   */
-  getDatesBetweenTimes(context, startTime, endTime) {
-
-    let dateList = [];
-    let dateTime = 0;
-    const betweenDates = (endTime - startTime) / 86400000;
-
-    for (let i = 0; i <= betweenDates; i++) {
-      dateList.push(moment(startTime).add(i, 'd').format('YYYYMMDD'));
-    }
-    return dateList;
-  }
-
-  /**
    * Get history by time interval.
    *
    * @param {Context} context context.
@@ -280,16 +260,11 @@ const Currency = class {
    * @param {String} end Date.
    * @return {Promise}
    */
-  async getHistoryByDates(context, bank, startDate, endDate) {
+  async getHistoryByDates(context, bank, dates) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getHistorybyInterval',
     });
-    moment().format("YYYYMMDD");
-    const startTime = moment(startDate).valueOf();
-    const endtTime = moment(endDate).valueOf();
-    const dates = getDatesBetweenTimes(startTime, endtTime);
     let rates = [];
-
     dates.forEach((date) => {
       let rate = {};
       rate.rate = await getHistory(context, bank, date);
