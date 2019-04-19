@@ -14,20 +14,19 @@ const Time = class {
      *
      * @param {Context} context context.
      * @param {Int} startDate timstamp.
-     * @param {Int} endtDate timstamp.
+     * @param {Int} endDate timstamp.
      * @return {Promise}
      */
-    async getDatesBetween(context, startDate, endtDate) {
-        moment().format('YYYYMMDD');
-        let dateList = [];
-        while (moment(startDate).isBefore(endtDate)) {
-            let i = 1;
-            dateList.push(startDate);
-            startDate = moment(startDate).add(i, 'd').format('YYYYMMDD');
-            i++;
-        }
-        dateList.push(startDate);
-        return dateList;
+    getDatesBetween(context, startDate, endDate) {
+      moment().format('YYYYMMDD');
+      let dateList = [];
+      let curDate = moment(startDate);
+      while (curDate.isBefore(endDate)) {
+        dateList.push(curDate.format('YYYYMMDD'));
+        curDate = curDate.add(1, 'd');
+      }
+      dateList.push(startDate);
+      return dateList;
     };
 };
 
