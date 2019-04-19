@@ -89,12 +89,12 @@ const Currency = class {
 
     // TODO support multiple currency source
     if (bank != 'BOT') {
-      context.logger.log('error', 'unsupport bank', { bank: bank });
+      context.logger.log('error', 'unsupport bank', {bank: bank});
       return {};
     }
 
     let resp = await this.client.get(context, this.url);
-    context.logger.log('debug', 'queryCurrency response', { resp: resp });
+    context.logger.log('debug', 'queryCurrency response', {resp: resp});
 
     let info = this.parseCurrency(resp.body, types);
     info.date = this.parseDate(resp.headers['content-disposition']);
