@@ -252,7 +252,7 @@ const Currency = class {
   }
 
   /**
-   * Get history by time interval.
+   * Get history by dates.
    *
    * @param {Context} context context.
    * @param {String} bank Bank name.
@@ -266,7 +266,7 @@ const Currency = class {
     });
     let rates = [];
     dates.forEach((date) => {
-      let rate = await getHistory(context, bank, api/fetchbygql.js );
+      let rate = await getHistory(context, bank, date);
       rates.push(rate);
     });
     return rates;

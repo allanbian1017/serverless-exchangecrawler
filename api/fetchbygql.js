@@ -42,7 +42,7 @@ module.main = Middleware.handle((context) => {
       let currency = args.currency;
       let dates = time.getDatesBetween(startDate, endDate);
       let historyRate = await store.getHistoryByDates(
-        Context, dates, bank);
+        Context, bank, dates);
       let currencyRate = [];
       historyRate.forEach((element) => {
         dailyRate = {}
