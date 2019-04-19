@@ -28,24 +28,25 @@ const schema = buildSchema(`
   }
 `);
 
-const resolvers = {
-  history: function (args) {
-    let startDate = args.startDate;
-    let endDate = args.endDate;
-    let currency = args.currency;
-    let historyRate = await store.getHistoryByDates(
-      Context, startDate, endDate, bank);
-    let currencyRate = {};
-    historyRate.forEach((element) => {
-      currencyRate.Date = element.date;
-      currencyRate.Rate = element.rate.currency;
-    });
-    return currencyRate;
-  },
-};
 
-module.exports.query = Middleware.handle(() => {
-  console.log(event);
+module.main = Middleware.handle((context) => {
+  let event = context.event;
+  context.logger.log('info', 'api request', event);
+  const resolvers = {
+    history: function (args) {
+      let startDate = args.startDate;
+      let endDate = args.endDate;
+      let currency = args.currency;
+      let historyRate = await store.getHistoryByDates(
+        Context, startDate, endDate, bank);
+      let currencyRate = {};
+      historyRate.forEach((element) => {
+        currencyRate.Date = element.date;
+        currencyRate.Rate = element.rate.currency;
+      });
+      return currencyRate;
+    },
+  };
   const result = graphql(schema, event.body, resolvers);
   return { statusCode: 200, body: JSON.stringify(result.data, null, 2) };
 });
