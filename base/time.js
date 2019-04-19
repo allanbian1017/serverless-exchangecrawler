@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const Time = class {
     /**
-     * Constructor for Storage object.
+     * Constructor for Time object.
      *
      */
     constructor() { }
