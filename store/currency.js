@@ -232,7 +232,7 @@ const Currency = class {
    * @param {String} date Date.
    * @return {Promise}
    */
-  getHistory(context, bank, date) {
+  async getHistory(context, bank, date) {
     metrics.count('exchange-crawler.Currency', 1, {
       func: 'getHistory',
     });

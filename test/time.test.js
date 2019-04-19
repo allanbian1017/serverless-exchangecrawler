@@ -2,6 +2,7 @@ const Time = require('../base/time');
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const logger = require('../base/logger');
+const Context = require('../base/context');
 
 describe('Time', function() {
     before(function() {
@@ -27,7 +28,7 @@ describe('Time', function() {
             return time
               .getDatesBetween(context, startDate, endDate)
               .then(function(dates) {
-                expect(dates).to.equal(expectData);
+                expect(dates).to.deep.equal(expectData);
                 return Promise.resolve();
               });
         });
