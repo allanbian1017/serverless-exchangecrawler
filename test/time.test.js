@@ -25,12 +25,9 @@ describe('Time', function() {
             let startDate = '20190222';
             let endDate = '20190301';
 
-            return time
-              .getDatesBetween(context, startDate, endDate)
-              .then(function(dates) {
-                expect(dates).to.deep.equal(expectData);
-                return Promise.resolve();
-              });
+            let dates = time.getDatesBetween(context, startDate, endDate)
+            expect(dates).to.deep.equal(expectData);
+            return Promise.resolve();
         });
     });
 });
