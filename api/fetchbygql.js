@@ -54,8 +54,8 @@ module.main = Middleware.handle((context) => {
       return currencyRate;
     },
   };
-  const result = graphql(schema, event.body, resolvers);
-  return Promise.resolve(
-    {statusCode: 200, body: JSON.stringify(result.data, null, 2)}
-  );
+  graphql(schema, event.body, resolvers)
+  .then((resolve)=>{
+    context.cb(resolve);
+  });
 });
