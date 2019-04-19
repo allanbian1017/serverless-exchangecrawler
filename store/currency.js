@@ -266,7 +266,7 @@ const Currency = class {
     let rates = [];
     dates.forEach(async (date) => {
       let rate = await getHistory(context, bank, date);
-      rates.push(rate[0]);
+      rates.push(rate[rate.length-1]);
     });
     return rates;
   }
