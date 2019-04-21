@@ -34,6 +34,14 @@ Setup Datadog api key:
 aws ssm put-parameter --type=String --name /exchangecrawler/DATADOG_API_KEY --value **YOUR API KEY**
 ```
 
+Setup Google Cloud crendential for BigQuery:
+
+```bash
+aws ssm put-parameter --type=String --name /exchangecrawler/GCP_PROJECT_ID --value **YOUR PROJECT ID**
+aws ssm put-parameter --type=String --name /exchangecrawler/GCP_CLIENT_EMAIL --value **YOUR CLIENT EMAIL**
+aws ssm put-parameter --type=String --name /exchangecrawler/GCP_PRIVATE_KEY --value **YOUR PRIVATE KEY**
+```
+
 Deploy ExchangeCrawler service to AWS:
 
 ```bash

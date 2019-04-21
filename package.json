@@ -9,6 +9,7 @@
   },
   "author": "allanbian",
   "dependencies": {
+    "@google-cloud/bigquery": "^3.0.0",
     "@line/bot-sdk": "^1.0.0",
     "aws-sdk": "^2.243.1",
     "aws-xray-sdk": "^1.1.6",
