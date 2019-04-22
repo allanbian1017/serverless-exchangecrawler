@@ -33,7 +33,7 @@ const Storage = class {
       let payload = JSON.parse(new Buffer(records.Body).toString('ascii'));
       return payload;
     } catch (err) {
-      if (err.code === 'Forbidden') {
+      if (err.code === 'Forbidden' || err.code === 'NotFound') {
         return Promise.reject(new NotFoundError('file not found'));
       }
 
