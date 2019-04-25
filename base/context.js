@@ -23,12 +23,7 @@ const Context = class {
    */
   cb(err, obj) {
     this.logger.end();
-    if (err) {
-      this.cb(err);
-      return;
-    }
-
-    this.cb(null, obj);
+    this.cb(err, obj);
   }
 };
 

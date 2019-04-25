@@ -3,7 +3,7 @@
 const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
 const NotFoundError = require('../base/error');
-const metrics = new Metrics();
+const metrics = new Metrics('currency');
 
 const Currency = class {
   /**
@@ -83,7 +83,7 @@ const Currency = class {
    * @return {Promise}
    */
   async queryCurrency(context, bank, types) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'queryCurrency',
     });
 
@@ -155,7 +155,7 @@ const Currency = class {
    * @return {Promise}
    */
   async crawlingCurrency(context, types) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'crawlingCurrency',
     });
 
@@ -191,7 +191,7 @@ const Currency = class {
    * @return {Promise}
    */
   async getCurrency(context, bank) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'getCurrency',
     });
 
@@ -212,7 +212,7 @@ const Currency = class {
    * @return {Promise}
    */
   async putCurrency(context, bank, data) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'putCurrency',
     });
 
@@ -233,7 +233,7 @@ const Currency = class {
    * @return {Promise}
    */
   async getHistory(context, bank, date) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'getHistory',
     });
 
@@ -261,7 +261,7 @@ const Currency = class {
    * @return {Promise}
    */
   async putHistory(context, bank, date, history) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'putHistory',
     });
 
@@ -284,7 +284,7 @@ const Currency = class {
    * @return {Promise}
    */
   async addHistory(context, bank, date, info) {
-    metrics.count('exchange-crawler.Currency', 1, {
+    metrics.count('exec', 1, {
       func: 'addHistory',
     });
 

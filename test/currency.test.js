@@ -1,5 +1,3 @@
-process.env.DATADOG_API_KEY = 'justfortest';
-
 const logger = require('../base/logger');
 const Context = require('../base/context');
 const KV = require('../base/kv');

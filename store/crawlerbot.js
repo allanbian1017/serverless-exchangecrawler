@@ -3,7 +3,7 @@
 const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
 const NotFoundError = require('../base/error');
-const metrics = new Metrics();
+const metrics = new Metrics('crawlerbot');
 
 const CrawlerBot = class {
   /**
@@ -28,7 +28,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async getUsers(context, plat) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'getUsers',
     });
 
@@ -55,7 +55,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async putUsers(context, plat, users) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'putUsers',
     });
 
@@ -77,7 +77,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async addSubscribeUser(context, plat, user) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'addSubscribeUser',
     });
 
@@ -97,7 +97,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async delSubscribeUser(context, plat, user) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'delSubscribeUser',
     });
 
@@ -121,7 +121,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async broadcastCurrency(context, plat, currency) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'broadcastCurrency',
     });
 
@@ -168,7 +168,7 @@ const CrawlerBot = class {
    * @return {Promise}
    */
   async queryCurrency(context, types) {
-    metrics.count('exchange-crawler.CrawlerBot', 1, {
+    metrics.count('exec', 1, {
       func: 'queryCurrency',
     });
 
