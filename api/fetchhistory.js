@@ -1,7 +1,6 @@
 'use strict';
 
 const Middleware = require('./middleware');
-const moment = require('moment');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
 
@@ -18,6 +17,7 @@ exports.main = Middleware.handle((context) => {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*',
+      'cache-control': 'public, max-age=1800',
     },
   };
 
@@ -28,12 +28,6 @@ exports.main = Middleware.handle((context) => {
       return store.getHistory(context, bank, date);
     })
     .then((data) => {
-      if (moment().format('YYYYMMDD') !== event.path.date) {
-        response.headers['cache-control'] = 'public, max-age=31536000';
-      } else {
-        response.headers['cache-control'] = 'public, max-age=1800';
-      }
-
       response.body = JSON.stringify({History: data});
       context.logger.log('info', 'api response', response);
       context.cb(null, response);
