@@ -125,3 +125,17 @@ functions:
       GCP_PROJECT_ID: ${ssm:/exchangecrawler/GCP_PROJECT_ID}
       GCP_CLIENT_EMAIL: ${ssm:/exchangecrawler/GCP_CLIENT_EMAIL}
       GCP_PRIVATE_KEY: ${ssm:/exchangecrawler/GCP_PRIVATE_KEY}
+  GetSubscription:
+    handler: api/getsub.main
+    events:
+      - http:
+          path: /{plat}/subscription
+          method: get
+          cors: true
+  UpdateSubscription:
+    handler: api/updatesub.main
+    events:
+      - http:
+          path: /{plat}/subscription
+          method: post
+          cors: true

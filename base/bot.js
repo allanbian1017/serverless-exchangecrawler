@@ -1,13 +1,16 @@
 'use strict';
 
 const line = require('@line/bot-sdk');
+const HttpClient = require('./httpclient');
 
 const Bot = class {
   /**
    * Constructor for Bot object.
    *
    */
-  constructor() {}
+  constructor() {
+    this.client = new HttpClient();
+  }
 
   /**
    * Bot publish message.
@@ -31,6 +34,33 @@ const Bot = class {
     }
 
     return {};
+  }
+
+  /**
+   * Get bot user id.
+   *
+   * @param {Context} context context.
+   * @param {String} plat platform belong to user.
+   * @param {String} token user token.
+   * @return {Promise}
+   */
+  async getUserID(context, plat, token) {
+    switch (plat) {
+      case 'line':
+        let apiUrl = 'https://api.line.me/v2/profile';
+        let resp = await this.client.get(context, apiUrl, {
+          Authorization: 'Bearer ' + token,
+        });
+
+        if (resp.body) {
+          let body = JSON.parse(resp.body);
+          return body.userId;
+        }
+
+        return '';
+    }
+
+    return '';
   }
 };
 

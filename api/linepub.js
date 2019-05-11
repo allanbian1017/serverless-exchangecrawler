@@ -4,14 +4,18 @@ const Middleware = require('./middleware');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
 const Bot = require('../base/bot');
+const Subscription = require('../store/subscription');
 const CrawlerBot = require('../store/crawlerbot');
 
 const storage = new Storage();
 const bot = new Bot();
 const currency = new Currency({});
+const subscription = new Subscription({
+  storage: storage,
+});
 const store = new CrawlerBot({
   bot: bot,
-  storage: storage,
+  subscription: subscription,
 });
 
 exports.main = Middleware.handle((context) => {

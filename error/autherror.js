@@ -1,10 +1,10 @@
 'use strict';
 
 /**
- * Error object.
+ * AuthError object.
  *
  */
-class NotFoundError extends Error {
+class AuthError extends Error {
   /**
    * Constructor for NotFoundError object.
    *
@@ -17,4 +17,4 @@ class NotFoundError extends Error {
   }
 }
 
-module.exports = NotFoundError;
+module.exports = AuthError;

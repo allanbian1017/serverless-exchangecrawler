@@ -4,6 +4,7 @@ const Middleware = require('./middleware');
 const KV = require('../base/kv');
 const Storage = require('../base/storage');
 const Currency = require('../store/currency');
+const Subscription = require('../store/subscription');
 const CrawlerBot = require('../store/crawlerbot');
 
 const storage = new Storage();
@@ -12,9 +13,12 @@ const currency = new Currency({
   storage: storage,
   kv: kv,
 });
+const subscription = new Subscription({
+  storage: storage,
+});
 const store = new CrawlerBot({
   currency: currency,
-  storage: storage,
+  subscription: subscription,
 });
 
 exports.main = Middleware.handle((context) => {
@@ -55,7 +59,7 @@ exports.main = Middleware.handle((context) => {
       } else if (body.result.action === 'subscription.unsubscribe') {
         let plat = body.originalRequest.source;
         let userID = body.originalRequest.data.source.userId;
-        return store.delSubscribeUser(context, plat, userID);
+        return store.removeSubscribeUser(context, plat, userID);
       } else {
         return Promise.resolve({text: '我不懂'});
       }

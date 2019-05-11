@@ -2,7 +2,7 @@
 
 const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
-const NotFoundError = require('../base/error');
+const NotFoundError = require('../error/notfounderror');
 const metrics = new Metrics('currency');
 
 const Currency = class {

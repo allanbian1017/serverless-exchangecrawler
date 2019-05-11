@@ -8,11 +8,12 @@ const HttpClient = class {
    *
    * @param {Context} context context.
    * @param {String} url Url.
+   * @param {Object} headers request headers.
    * @return {Promise}
    */
-  get(context, url) {
+  get(context, url, headers) {
     return new Promise((resolve, reject) => {
-      request({url: url}, (err, data) => {
+      request({url: url, headers: headers}, (err, data) => {
         if (err) return reject(err);
 
         resolve(data);

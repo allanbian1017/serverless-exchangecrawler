@@ -2,7 +2,6 @@
 
 const moment = require('moment-timezone');
 const Metrics = require('../base/metrics');
-const NotFoundError = require('../base/error');
 const metrics = new Metrics('crawlerbot');
 
 const CrawlerBot = class {
@@ -10,105 +9,47 @@ const CrawlerBot = class {
    * Constructor for CrawlerBot object.
    *
    * @param {Object} options JSON configuration.
-   * @param {Object} options.storage Storage object.
-   * @param {Object} options.currency Currency object.
    * @param {Object} options.bot Bot object.
+   * @param {Object} options.currency Currency object.
+   * @param {Object} options.subscription Subscription object.
    */
   constructor(options) {
-    this.storage = options.storage;
-    this.currency = options.currency;
     this.bot = options.bot;
+    this.currency = options.currency;
+    this.subscription = options.subscription;
   }
 
   /**
-   * Get bot users.
+   * Add bot user to subscription list.
    *
    * @param {Context} context context.
    * @param {String} plat Bot platform.
+   * @param {String} userID Bot user id.
    * @return {Promise}
    */
-  async getUsers(context, plat) {
-    metrics.count('exec', 1, {
-      func: 'getUsers',
-    });
-
-    try {
-      let path = 'Users/' + plat + '.json';
-      let record = await this.storage.get(context, 'currencybucket', path);
-      return record.Users;
-    } catch (err) {
-      context.logger.log('error', 'getUsers error', {err: err});
-      if (err instanceof NotFoundError) {
-        return {};
-      }
-
-      return err;
-    }
-  }
-
-  /**
-   * Put bot users.
-   *
-   * @param {Context} context context.
-   * @param {String} plat Bot platform.
-   * @param {Object} users Bot users.
-   * @return {Promise}
-   */
-  async putUsers(context, plat, users) {
-    metrics.count('exec', 1, {
-      func: 'putUsers',
-    });
-
-    let obj = {
-      Users: users,
-    };
-
-    let path = 'Users/' + plat + '.json';
-    await this.storage.put(context, 'currencybucket', path, obj);
-    return {};
-  }
-
-  /**
-   * Add bot user.
-   *
-   * @param {Context} context context.
-   * @param {String} plat Bot platform.
-   * @param {Object} user Bot user.
-   * @return {Promise}
-   */
-  async addSubscribeUser(context, plat, user) {
+  async addSubscribeUser(context, plat, userID) {
     metrics.count('exec', 1, {
       func: 'addSubscribeUser',
     });
 
-    // FIXME this is not atomic operation, it may cause racing issue
-    let users = await this.getUsers(context, plat);
-    users.push(user);
-    await this.putUsers(context, plat, users);
+    await this.subscription.addUser(context, plat, userID);
     return {text: '訂閱成功'};
   }
 
   /**
-   * Delete bot user.
+   * Remove bot user subscription.
    *
    * @param {Context} context context.
    * @param {String} plat Bot platform.
-   * @param {Object} user Bot user.
+   * @param {String} userID Bot user id.
    * @return {Promise}
    */
-  async delSubscribeUser(context, plat, user) {
+  async removeSubscribeUser(context, plat, userID) {
     metrics.count('exec', 1, {
-      func: 'delSubscribeUser',
+      func: 'removeSubscribeUser',
     });
 
-    // FIXME this is not atomic operation, it may cause racing issue
-    let users = await this.getUsers(context, plat);
-    let idx = users.indexOf(user);
-    if (idx !== -1) {
-      users.splice(idx, 1);
-    }
-
-    await this.putUsers(context, plat, users);
+    await this.subscription.removeUser(context, plat, userID);
     return {text: '取消訂閱成功'};
   }
 
@@ -127,7 +68,7 @@ const CrawlerBot = class {
 
     context.logger.log('debug', 'broadcase currency', currency);
     let msg = this.getCurrencyMsg(currency);
-    let users = await this.getUsers(context, plat);
+    let users = await this.subscription.listUsers(context, plat);
     await this.bot.publish(context, plat, users, msg);
     return {};
   }

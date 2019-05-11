@@ -3,6 +3,7 @@ const Context = require('../base/context');
 const Storage = require('../base/storage');
 const Bot = require('../base/bot');
 const Currency = require('../store/currency');
+const Subscription = require('../store/subscription');
 const CrawlerBot = require('../store/crawlerbot');
 const expect = require('chai').expect;
 const sinon = require('sinon');
@@ -11,6 +12,7 @@ describe('CrawlerBot', function() {
   let storage;
   let currency;
   let bot;
+  let subscription;
   let store;
   let context;
 
@@ -18,11 +20,13 @@ describe('CrawlerBot', function() {
     context = new Context({logger: logger});
     storage = new Storage();
     bot = new Bot();
+    subscription = new Subscription({});
     currency = new Currency({});
     store = new CrawlerBot({
       storage: storage,
-      currency: currency,
       bot: bot,
+      currency: currency,
+      subscription: subscription,
     });
   });
 
@@ -96,17 +100,12 @@ describe('CrawlerBot', function() {
         '人民幣匯率4.5\n' +
         '更新時間:2017-09-20 10:04\n' +
         '供您参考';
-      const expectObj = {
-        Users: ['123', '456', '789'],
-      };
       const expectUsers = ['123', '456', '789'];
-      const expectBucket = 'currencybucket';
-      const expectPath = 'Users/' + testPlat + '.json';
 
       sandbox
-        .stub(storage, 'get')
-        .withArgs(context, expectBucket, expectPath)
-        .resolves(expectObj)
+        .stub(subscription, 'listUsers')
+        .withArgs(context, testPlat)
+        .resolves(expectUsers)
         .withArgs()
         .rejects();
       sandbox
@@ -118,7 +117,6 @@ describe('CrawlerBot', function() {
       return store
         .broadcastCurrency(context, testPlat, testCurrency)
         .then(function() {
-          sandbox.verify();
           return Promise.resolve();
         })
         .catch(function(err) {
@@ -141,25 +139,11 @@ describe('CrawlerBot', function() {
     it('should execute success without error', function() {
       const testPlat = 'line';
       const testUserId = '1234';
-      const testObj = {
-        Users: ['789'],
-      };
-      const expectBucket = 'currencybucket';
-      const expectPath = 'Users/' + testPlat + '.json';
-      const expectObj = {
-        Users: ['789', testUserId],
-      };
       const expectMsg = '訂閱成功';
 
       sandbox
-        .stub(storage, 'get')
-        .withArgs(context, expectBucket, expectPath)
-        .resolves(testObj)
-        .withArgs()
-        .rejects();
-      sandbox
-        .stub(storage, 'put')
-        .withArgs(context, expectBucket, expectPath, expectObj)
+        .stub(subscription, 'addUser')
+        .withArgs(context, testPlat, testUserId)
         .resolves()
         .withArgs()
         .rejects();
@@ -190,31 +174,17 @@ describe('CrawlerBot', function() {
     it('should execute success without error', function() {
       const testPlat = 'line';
       const testUserId = '1234';
-      const testObj = {
-        Users: ['789', testUserId],
-      };
-      const expectBucket = 'currencybucket';
-      const expectPath = 'Users/' + testPlat + '.json';
-      const expectObj = {
-        Users: ['789'],
-      };
       const expectMsg = '取消訂閱成功';
 
       sandbox
-        .stub(storage, 'get')
-        .withArgs(context, expectBucket, expectPath)
-        .resolves(testObj)
-        .withArgs()
-        .rejects();
-      sandbox
-        .stub(storage, 'put')
-        .withArgs(context, expectBucket, expectPath, expectObj)
+        .stub(subscription, 'removeUser')
+        .withArgs(context, testPlat, testUserId)
         .resolves()
         .withArgs()
         .rejects();
 
       return store
-        .delSubscribeUser(context, testPlat, testUserId)
+        .removeSubscribeUser(context, testPlat, testUserId)
         .then(function(data) {
           expect(data.text).to.equal(expectMsg);
           return Promise.resolve();
