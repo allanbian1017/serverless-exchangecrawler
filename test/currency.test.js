@@ -59,17 +59,6 @@ describe('Currency', function() {
 
     it('should execute success without error', function() {
       const testBank = 'BOT';
-      const testCachedObj = {
-        data: {
-          date: 1495007420000,
-          USD: 30,
-        },
-      };
-      const testHistory = {
-        History: [],
-      };
-      const expectDate = '20170517';
-      const path = 'History/' + testBank + '/' + expectDate + '.json';
       let fixedObj = {body: fixedBody, headers: {}};
       fixedObj.headers['content-disposition'] = fixedContentHeaders;
 
@@ -80,27 +69,10 @@ describe('Currency', function() {
         .withArgs()
         .rejects();
       sandbox
-        .stub(kv, 'get')
-        .withArgs(context, 'currency', 'BOT')
-        .resolves(testCachedObj)
-        .withArgs()
-        .rejects();
-      sandbox
-        .stub(storage, 'get')
-        .withArgs(context, 'currencybucket', path)
-        .resolves(testHistory)
-        .withArgs()
-        .rejects();
-      sandbox
-        .mock(storage)
-        .expects('put')
-        .once()
-        .withArgs(context, 'currencybucket', path, sinon.match.any);
-      sandbox
         .mock(kv)
         .expects('put')
         .once()
-        .withArgs(context, 'currency', 'BOT', sinon.match.any);
+        .withArgs(context, 'currency', testBank, sinon.match.any);
 
       return store
         .crawlingCurrency(context, ['USD'])

@@ -122,6 +122,19 @@ const Currency = class {
    *  }
    * }
    *
+   * Returned Currency object example:
+   * {
+   *   "USD":31.13,
+   *   "HKD":3.983,
+   *   "GBP":41.22,
+   *   "AUD":22.39,
+   *   "JPY":0.2797,
+   *   "EUR":35.33,
+   *   "KRW":0.0292,
+   *   "CNY":4.65,
+   *   "date":1555031100000,
+   * },
+   *
    * @param {Context} context context.
    * @param {Object} record DynamoDB Stream record.
    * @return {Object}
@@ -159,27 +172,8 @@ const Currency = class {
       func: 'crawlingCurrency',
     });
 
-    let curRec = await this.queryCurrency(context, 'BOT', types);
-    let cacheRec = await this.getCurrency(context, 'BOT');
-
-    if (Object.keys(cacheRec).length) {
-      if (new Date(curRec.date) > new Date(cacheRec.date)) {
-        context.logger.log('debug', 'new record is found', curRec);
-
-        let dateStr = moment(curRec.date).format('YYYYMMDD');
-        await this.addHistory(context, 'BOT', dateStr, curRec);
-        await this.putCurrency(context, 'BOT', curRec);
-        return {};
-      }
-    } else {
-      context.logger.log('debug', 'new record is found', curRec);
-
-      let dateStr = moment(curRec.date).format('YYYYMMDD');
-      await this.addHistory(context, 'BOT', dateStr, curRec);
-      await this.putCurrency(context, 'BOT', curRec);
-      return {};
-    }
-
+    let currency = await this.queryCurrency(context, 'BOT', types);
+    await this.putCurrency(context, 'BOT', currency);
     return {};
   }
 

@@ -112,8 +112,8 @@ functions:
       - http:
           path: bot/
           method: post
-  BQHandle:
-    handler: api/bqhandle.main
+  AddHistory:
+    handler: api/addhistory.main
     events:
       - stream:
           type: dynamodb
