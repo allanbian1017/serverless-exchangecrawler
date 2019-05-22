@@ -146,7 +146,9 @@ const Currency = class {
     }
 
     let obj = record.data.M;
-    let currencyObj = {};
+    let currencyObj = {
+      Bank: record.bank.S,
+    };
     Object.keys(obj).forEach((x) => {
       if (obj[x].N) {
         if (x == 'date') {
