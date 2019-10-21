@@ -28,7 +28,7 @@ exports.main = Middleware.handle((context) => {
   const body = JSON.parse(event.body);
   let response = {};
 
-  if (!body.result || !body.result.action) {
+  if (!body.queryResult || !body.queryResult.action) {
     response.statusCode = 400;
     response.body = JSON.stringify({
       message: 'Bad Request',
@@ -38,8 +38,12 @@ exports.main = Middleware.handle((context) => {
 
   Promise.resolve()
     .then(() => {
-      if (body.result.action === 'query.currency') {
-        if (!body.result.parameters || !body.result.parameters.CurrencyType) {
+      let action = body.queryResult.action;
+      if (action === 'query.currency') {
+        if (
+          !body.queryResult.parameters ||
+          !body.queryResult.parameters.CurrencyType
+        ) {
           response.statusCode = 400;
           response.body = JSON.stringify({
             message: 'Bad Request',
@@ -47,18 +51,18 @@ exports.main = Middleware.handle((context) => {
           return context.cb(null, response);
         }
 
-        let types = [body.result.parameters.CurrencyType];
+        let types = [body.queryResult.parameters.CurrencyType];
         return store.queryCurrency(context, types);
-      } else if (body.result.action === 'query.currency.all') {
+      } else if (action === 'query.currency.all') {
         let types = ['USD', 'JPY', 'AUD', 'CNY', 'KRW', 'EUR', 'GBP', 'HKD'];
         return store.queryCurrency(context, types);
-      } else if (body.result.action === 'subscription.subscribe') {
-        let plat = body.originalRequest.source;
-        let userID = body.originalRequest.data.source.userId;
+      } else if (action === 'subscription.subscribe') {
+        let plat = body.originalDetectIntentRequest.source;
+        let userID = body.originalDetectIntentRequest.data.source.userId;
         return store.addSubscribeUser(context, plat, userID);
-      } else if (body.result.action === 'subscription.unsubscribe') {
-        let plat = body.originalRequest.source;
-        let userID = body.originalRequest.data.source.userId;
+      } else if (action === 'subscription.unsubscribe') {
+        let plat = body.originalDetectIntentRequest.source;
+        let userID = body.originalDetectIntentRequest.data.source.userId;
         return store.removeSubscribeUser(context, plat, userID);
       } else {
         return Promise.resolve({text: '我不懂'});
@@ -67,8 +71,7 @@ exports.main = Middleware.handle((context) => {
     .then((data) => {
       response.statusCode = 200;
       response.body = JSON.stringify({
-        speech: data.text,
-        displayText: data.text,
+        fulfillmentText: data.text,
       });
 
       context.logger.log('info', 'api response', response);
