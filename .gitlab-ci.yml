@@ -1,4 +1,4 @@
-image: node:8.10
+image: node:12.22
 
 stages:
   - build
@@ -29,6 +29,8 @@ run_test:
 deploy_production:
   stage: deploy
   script:
+    - npm config set user 0
+    - npm config set unsafe-perm true
     - npm install -g serverless
     - sls deploy
   environment:
