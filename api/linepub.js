@@ -45,6 +45,6 @@ exports.main = Middleware.handle((context) => {
     })
     .catch((err) => {
       context.logger.log('error', 'pub error', err);
-      context.cb(err);
+      context.cb();
     });
 });
