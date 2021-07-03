@@ -64,7 +64,7 @@ describe('Currency', function() {
 
       sandbox
         .stub(client, 'get')
-        .withArgs(context, 'http://rate.bot.com.tw/xrt/fltxt/0/day')
+        .withArgs(context, 'https://rate.bot.com.tw/xrt/fltxt/0/day')
         .resolves(fixedObj)
         .withArgs()
         .rejects();
@@ -105,7 +105,7 @@ describe('Currency', function() {
 
       sandbox
         .stub(client, 'get')
-        .withArgs(context, 'http://rate.bot.com.tw/xrt/fltxt/0/day')
+        .withArgs(context, 'https://rate.bot.com.tw/xrt/fltxt/0/day')
         .resolves(fixedObj)
         .withArgs()
         .rejects();

@@ -21,7 +21,7 @@ const Currency = class {
     this.storage = options.storage;
     this.currencyChangedTopic = options.currencyChangedTopic;
     this.client = options.client;
-    this.url = 'http://rate.bot.com.tw/xrt/fltxt/0/day';
+    this.url = 'https://rate.bot.com.tw/xrt/fltxt/0/day';
   }
 
   /**
